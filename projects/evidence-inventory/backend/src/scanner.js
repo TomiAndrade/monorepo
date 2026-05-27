@@ -26,10 +26,9 @@ async function scanDirectory(rootPath) {
 
     const emptyFolders = new Set();
 
-    // Recursive scan function
+    // Recursive scan function — returns true if the directory contains any real files
     async function scanDir(dirPath, relativePath = '') {
-      let hasFiles = false;
-      let hasSubfolders = false;
+      let hasRealContent = false;
 
       try {
         const entries = await fs.readdir(dirPath, { withFileTypes: true });
@@ -39,10 +38,12 @@ async function scanDirectory(rootPath) {
           const entryRelativePath = path.join(relativePath, entry.name);
 
           if (entry.isDirectory()) {
-            hasSubfolders = true;
-            await scanDir(fullPath, entryRelativePath);
+            const subHasContent = await scanDir(fullPath, entryRelativePath);
+            if (subHasContent) {
+              hasRealContent = true;
+            }
           } else if (entry.isFile()) {
-            hasFiles = true;
+            hasRealContent = true;
             const fileStats = await fs.stat(fullPath);
             const ext = path.extname(entry.name).toLowerCase() || '.no-extension';
             const fileSize = fileStats.size;
@@ -65,8 +66,8 @@ async function scanDirectory(rootPath) {
           }
         }
 
-        // Check if folder is empty (no files and no subfolders with files)
-        if (!hasFiles && !hasSubfolders) {
+        // Mark as empty if no real file content anywhere in the subtree, skip root
+        if (!hasRealContent && relativePath !== '') {
           emptyFolders.add(relativePath);
         }
       } catch (error) {
@@ -76,6 +77,8 @@ async function scanDirectory(rootPath) {
           throw error;
         }
       }
+
+      return hasRealContent;
     }
 
     await scanDir(rootPath);
@@ -110,7 +113,7 @@ async function exportResults(results, outputPath) {
     await fs.mkdir(outputPath, { recursive: true });
 
     // Export JSON
-    const jsonPath = path.join(outputPath, 'scan-results.json');
+    const jsonPath = path.join(outputPath, 'results.json');
     await fs.writeFile(jsonPath, JSON.stringify(results, null, 2), 'utf-8');
 
     // Export CSV
