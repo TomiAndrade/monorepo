@@ -1,0 +1,50 @@
+{
+  "scannedPath": "C:\\Users\\tomas\\monorepo\\projects\\evidence-inventory\\backend\\mock-evidence",
+  "totalFiles": 15,
+  "totalSizeBytes": 1142,
+  "emptyFolders": [
+    "carpeta-vacia"
+  ],
+  "byExtension": {
+    ".json": {
+      "count": 1,
+      "totalSizeBytes": 77,
+      "totalSizeMB": 0
+    },
+    ".csv": {
+      "count": 2,
+      "totalSizeBytes": 158,
+      "totalSizeMB": 0
+    },
+    ".docx": {
+      "count": 2,
+      "totalSizeBytes": 161,
+      "totalSizeMB": 0
+    },
+    ".pdf": {
+      "count": 3,
+      "totalSizeBytes": 237,
+      "totalSizeMB": 0
+    },
+    ".png": {
+      "count": 2,
+      "totalSizeBytes": 154,
+      "totalSizeMB": 0
+    },
+    ".jpg": {
+      "count": 3,
+      "totalSizeBytes": 222,
+      "totalSizeMB": 0
+    },
+    ".txt": {
+      "count": 1,
+      "totalSizeBytes": 56,
+      "totalSizeMB": 0
+    },
+    ".mp4": {
+      "count": 1,
+      "totalSizeBytes": 77,
+      "totalSizeMB": 0
+    }
+  }
+}
