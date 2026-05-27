@@ -1,7 +1,7 @@
 {
   "scannedPath": "C:\\Users\\tomas\\monorepo\\projects\\evidence-inventory\\backend\\mock-evidence",
-  "totalFiles": 15,
-  "totalSizeBytes": 1142,
+  "totalFiles": 20,
+  "totalSizeBytes": 6030841,
   "emptyFolders": [
     "carpeta-vacia"
   ],
@@ -22,8 +22,13 @@
       "totalSizeMB": 0
     },
     ".pdf": {
-      "count": 3,
-      "totalSizeBytes": 237,
+      "count": 7,
+      "totalSizeBytes": 6029768,
+      "totalSizeMB": 5.75
+    },
+    ".ini": {
+      "count": 1,
+      "totalSizeBytes": 168,
       "totalSizeMB": 0
     },
     ".png": {
