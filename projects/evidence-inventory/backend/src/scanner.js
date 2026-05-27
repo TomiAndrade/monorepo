@@ -1,4 +1,5 @@
 const fs = require('fs/promises');
+const fsSync = require('fs');
 const path = require('path');
 const csv = require('fast-csv');
 
@@ -129,7 +130,7 @@ async function exportResults(results, outputPath) {
     csvData.sort((a, b) => a.extension.localeCompare(b.extension));
 
     await new Promise((resolve, reject) => {
-      const ws = fs.createWriteStream(csvPath);
+      const ws = fsSync.createWriteStream(csvPath);
       csv.write(csvData, { headers: true })
         .pipe(ws)
         .on('finish', resolve)
