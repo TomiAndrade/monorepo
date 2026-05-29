@@ -3,7 +3,8 @@ const path = require('path');
 const { spawn } = require('child_process');
 const net = require('net');
 
-let mainWindow;
+const isDev = !app.isPackaged;
+
 let backendProcess;
 
 function startBackend() {
@@ -48,7 +49,7 @@ function waitForPort(port, timeout = 15000) {
 }
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const win = new BrowserWindow({
     width: 1280,
     height: 800,
     title: 'Evidence Inventory',
@@ -57,7 +58,11 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadURL('http://localhost:5173');
+  if (isDev) {
+    win.loadURL('http://localhost:5173');
+  } else {
+    win.loadFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+  }
 }
 
 app.whenReady().then(async () => {
