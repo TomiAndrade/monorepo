@@ -8,7 +8,9 @@ const isDev = !app.isPackaged;
 let backendProcess;
 
 function startBackend() {
-  const backendCwd = path.join(__dirname, '..', 'backend');
+  const backendCwd = isDev
+    ? path.join(__dirname, '..', 'backend')
+    : path.join(process.resourcesPath, 'backend');
   backendProcess = spawn('node', ['src/index.js'], {
     cwd: backendCwd,
   });
@@ -61,7 +63,9 @@ function createWindow() {
   if (isDev) {
     win.loadURL('http://localhost:5173');
   } else {
-    win.loadFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
+    win.loadFile(
+      path.join(process.resourcesPath, 'frontend', 'dist', 'index.html')
+    );
   }
 }
 
