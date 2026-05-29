@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const net = require('net');
 
@@ -11,6 +12,9 @@ function startBackend() {
   const backendCwd = isDev
     ? path.join(__dirname, '..', 'backend')
     : path.join(process.resourcesPath, 'backend');
+  console.log('[Backend] cwd:', backendCwd);
+  console.log('[Backend] isDev:', isDev);
+  console.log('[Backend] resourcesPath:', process.resourcesPath);
   backendProcess = spawn('node', ['src/index.js'], {
     cwd: backendCwd,
   });
@@ -21,6 +25,8 @@ function startBackend() {
 
   backendProcess.stderr.on('data', (data) => {
     console.error(data.toString());
+    const logPath = path.join(app.getPath('userData'), 'error.log');
+    fs.appendFileSync(logPath, data.toString());
   });
 }
 
@@ -51,6 +57,8 @@ function waitForPort(port, timeout = 15000) {
 }
 
 function createWindow() {
+  console.log('[Window] cargando desde:', isDev ? 'vite' : path.join(process.resourcesPath, 'frontend', 'dist', 'index.html'));
+
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -58,6 +66,12 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true
     }
+  });
+
+  win.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('[Window] Error al cargar:', errorCode, errorDescription);
+    const logPath = path.join(app.getPath('userData'), 'error.log');
+    fs.appendFileSync(logPath, `Window load error: ${errorCode} ${errorDescription}\n`);
   });
 
   if (isDev) {
