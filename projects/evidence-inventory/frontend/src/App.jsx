@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import ScannerForm from './components/ScannerForm'
 import SummaryCards from './components/SummaryCards'
@@ -7,10 +7,22 @@ import FileTypeTable from './components/FileTypeTable'
 
 function App() {
   const [results, setResults] = useState(null)
+  const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
+
+  const toggleTheme = () => setDarkMode((prev) => !prev)
 
   return (
     <div className="app">
-      <h1 className="app-title">Inventario de Evidencia</h1>
+      <div className="app-header">
+        <h1 className="app-title">Inventario de Evidencia</h1>
+        <button type="button" className="theme-toggle" onClick={toggleTheme}>
+          {darkMode ? '☀️ Claro' : '🌙 Oscuro'}
+        </button>
+      </div>
 
       <ScannerForm onResults={setResults} />
 
