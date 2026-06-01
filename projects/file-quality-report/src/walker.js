@@ -2,6 +2,7 @@
 import { readdirSync, statSync } from 'fs';
 import { join, resolve } from 'path';
 
+//directorios a ignorar
 const DEFAULT_IGNORE = [
   'node_modules',
   '.git',
@@ -11,6 +12,14 @@ const DEFAULT_IGNORE = [
   '.DS_Store',
 ];
 
+//archivos a ignorar
+const DEFAULT_IGNORE_FILES = [
+  '.gitkeep',
+  'desktop.ini',
+  'Thumbs.db',
+];
+
+//recorre un directorio recursivamente y recopila archivos con sus stats
 export function walkDirectory(dirPath, options = {}) {
   const {
     ignore = DEFAULT_IGNORE,
@@ -30,6 +39,8 @@ export function walkDirectory(dirPath, options = {}) {
 
   for (const entry of entries) {
     if (ignore.includes(entry.name)) continue;
+
+    if (DEFAULT_IGNORE_FILES.includes(entry.name)) continue;
 
     const fullPath = join(resolvedDir, entry.name);
 
