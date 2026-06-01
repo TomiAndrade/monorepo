@@ -1,0 +1,13 @@
+{
+  "name": "file-quality-report",
+  "version": "0.1.0",
+  "description": "Herramienta CLI para análisis de calidad de archivos en un directorio",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  },
+  "keywords": ["cli", "file-analysis", "quality"],
+  "license": "MIT"
+}
