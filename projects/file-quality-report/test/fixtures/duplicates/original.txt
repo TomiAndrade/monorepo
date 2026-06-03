@@ -1,0 +1,3 @@
+Este es el contenido original del archivo.
+Tiene múltiples líneas para generar un hash.
+La fecha de creación es 2026-06-01.

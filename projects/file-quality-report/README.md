@@ -6,20 +6,20 @@ El objetivo es detectar problemas comunes que afectan la organización, mantenim
 
 ## Características
 
-Actualmente el analizador puede detectar:
+- **Archivos vacíos**: Detecta archivos con 0 bytes de contenido
+- **Extensiones no esperadas**: Identifica extensiones fuera de una lista permitida
+- **Duplicados probables**: Encuentra archivos con contenido idéntico (hash MD5)
+- **Archivos muy grandes**: Alerta sobre archivos que exceden el tamaño máximo (10 MB)
+- **Archivos muy pequeños**: Detecta archivos sospechosamente pequeños (< 10 bytes)
+- **Metadata faltante**: Identifica archivos sin extensión o con fechas inválidas
 
-- Archivos vacíos
-- Extensiones no esperadas
-- Duplicados probables
-- Archivos muy grandes
-- Archivos muy pequeños
-- Archivos sin metadata mínima
+### Funcionalidades adicionales
 
-Además:
-
-- Genera reportes legibles en consola
-- Permite exportar resultados en formato JSON
-- Ignora archivos técnicos del repositorio (`.gitkeep`, `desktop.ini`, `Thumbs.db`)
+- Reportes legibles en consola con colores y formato estructurado
+- Exportación de resultados en formato JSON
+- Ignorado automático de archivos técnicos (`.gitkeep`, `desktop.ini`, `Thumbs.db`)
+- Exclusión de directorios de dependencias y build (`node_modules`, `.git`, `dist`)
+- Acciones sugeridas basadas en los problemas detectados
 
 ---
 
@@ -29,26 +29,36 @@ Además:
 file-quality-report/
 ├── src/
 │   ├── analyzer/
-│   │   ├── duplicates.js
-│   │   ├── emptyFiles.js
-│   │   ├── missingMetadata.js
-│   │   ├── sizeOutliers.js
-│   │   ├── unexpectedExtensions.js
-│   │   └── index.js
+│   │   ├── duplicates.js         # Detector de duplicados (hash MD5)
+│   │   ├── emptyFiles.js         # Detector de archivos vacíos
+│   │   ├── missingMetadata.js    # Detector de metadata faltante
+│   │   ├── sizeOutliers.js       # Detector de archivos grandes/pequeños
+│   │   ├── unexpectedExtensions.js # Detector de extensiones no esperadas
+│   │   └── index.js              # Orquestador de analyzers
 │   │
 │   ├── reporter/
-│   │   ├── formatter.js
-│   │   ├── consoleReporter.js
-│   │   ├── jsonReporter.js
-│   │   └── index.js
+│   │   ├── formatter.js          # Formateador de reportes
+│   │   ├── consoleReporter.js    # Reporte a consola (colores ANSI)
+│   │   ├── jsonReporter.js       # Exportador a JSON
+│   │   └── index.js              # Exportaciones del módulo
 │   │
-│   ├── walker.js
-│   └── index.js
+│   ├── walker.js                 # Recorredor de directorios
+│   └── index.js                  # Entry point CLI
 │
-├── outputs/
 ├── docs/
+│   └── validation-rules.md       # Documentación técnica de reglas
+│
 ├── test/
-└── README.md
+│   ├── fixtures/                 # Archivos de prueba para cada caso
+│   │   ├── empty/                # Archivos vacíos
+│   │   ├── duplicates/           # Archivos duplicados
+│   │   ├── unexpected-extensions/# Extensiones no permitidas
+│   │   ├── size-outliers/        # Archivos grandes/pequeños
+│   │   └── missing-metadata/     # Sin extensión o fecha inválida
+│   └── run-tests.js              # Test runner (sin dependencias)
+│
+├── outputs/                      # Reportes JSON generados
+└── README.md                     # Este archivo
 ```
 
 ---
@@ -56,7 +66,21 @@ file-quality-report/
 ## Requisitos
 
 - Node.js 18 o superior
-- Sistema operativo compatible con Node.js
+- Sistema operativo compatible con Node.js (Windows, macOS, Linux)
+
+---
+
+## Instalación
+
+No requiere instalación de dependencias. El proyecto usa solo módulos built-in de Node.js.
+
+```bash
+# Clonar o copiar el proyecto
+cd projects/file-quality-report
+
+# Verificar versión de Node.js
+node --version  # Debe ser 18 o superior
+```
 
 ---
 
@@ -82,23 +106,38 @@ node src/index.js ../evidence-inventory
 
 ---
 
-## Exportar reporte JSON
+## Uso con --json
+
+Para exportar el reporte en formato JSON, agrega la flag `--json`:
 
 ```bash
+# Analizar directorio actual y exportar JSON
 node src/index.js . --json
+
+# Analizar directorio específico y exportar JSON
+node src/index.js ./ruta/al/directorio --json
 ```
 
-El reporte se guarda automáticamente en:
+El reporte JSON se guarda automáticamente en:
 
 ```text
 outputs/report-{timestamp}.json
 ```
 
-Ejemplo:
+Ejemplo de nombre generado:
 
 ```text
 outputs/report-2026-06-01T18-45-10-000Z.json
 ```
+
+### Estructura del JSON
+
+El archivo JSON incluye:
+- `summary`: Totales por severidad (errors, warnings, infos)
+- `sections`: Array de secciones con título, severidad e ítems
+- `suggestedActions`: Lista de acciones recomendadas
+- `generatedAt`: Timestamp de generación
+- `version`: Versión del formato de reporte
 
 ---
 
@@ -134,14 +173,68 @@ Resumen:
 
 ## Reglas de validación
 
-| Regla | Severidad |
-|---------|---------|
-| Archivo vacío | Error |
-| Duplicado probable | Error |
-| Extensión inesperada | Warning |
-| Archivo muy grande | Warning |
-| Metadata faltante | Warning |
-| Archivo muy pequeño | Info |
+### Resumen de severidades
+
+| Regla | Tipo | Severidad | Descripción |
+| ----- | ---- | --------- | ----------- |
+| Archivo vacío | `empty` | **Error** | Archivo con tamaño de 0 bytes |
+| Duplicado probable | `duplicate` | **Error** | Archivo con contenido idéntico a otro (hash MD5) |
+| Archivo muy grande | `too_large` | **Warning** | Archivo > 10 MB |
+| Extensión inesperada | `unexpected_extension` | **Warning** | Extensión no en lista permitida |
+| Metadata faltante | `no_extension` | **Warning** | Archivo sin extensión |
+| Fecha inválida | `invalid_date` | **Warning** | Fecha de modificación < año 2000 |
+| Archivo muy pequeño | `too_small` | **Info** | Archivo no vacío < 10 bytes |
+
+### Criterios detallados
+
+**Extensiones permitidas por defecto:**
+`.js`, `.ts`, `.jsx`, `.tsx`, `.json`, `.md`, `.txt`, `.csv`, `.html`, `.css`, `.env`, `.gitkeep`, `.png`, `.jpg`, `.jpeg`, `.svg`, `.pdf`
+
+**Umbrellas de tamaño:**
+- Máximo: 10 MB (`10 * 1024 * 1024` bytes)
+- Mínimo informativo: 10 bytes (`minNonEmptyBytes`)
+
+Para documentación técnica completa, ver: [`docs/validation-rules.md`](docs/validation-rules.md)
+
+---
+
+## Testing
+
+El proyecto incluye un test runner propio sin dependencias externas.
+
+### Ejecutar tests
+
+```bash
+node test/run-tests.js
+```
+
+### Casos de prueba incluidos
+
+| Test | Descripción |
+|------|-------------|
+| `emptyFiles` | Detecta archivos con 0 bytes |
+| `duplicates` | Detecta archivos con contenido idéntico |
+| `unexpectedExtensions` | Detecta extensiones no permitidas (.mp4, .bin) |
+| `sizeOutliers` | Detecta archivos muy pequeños (< 10 bytes) |
+| `sizeOutliers (large file)` | Detecta archivos muy grandes (> umbral) |
+| `missingMetadata` | Detecta archivos sin extensión |
+| `missingMetadata (invalid date)` | Detecta archivos con fecha < 2000 |
+
+### Fixtures de prueba
+
+Los archivos de prueba se encuentran en `test/fixtures/`:
+
+```
+test/fixtures/
+├── empty/empty-file.txt              # Archivo vacío (0 bytes)
+├── duplicates/original.txt           # Archivo original
+├── duplicates/duplicate.txt          # Duplicado (mismo contenido)
+├── unexpected-extensions/video.mp4   # Extensión no permitida
+├── unexpected-extensions/data.bin   # Extensión no permitida
+├── size-outliers/tiny.dat           # Archivo de 1 byte
+└── missing-metadata/README          # Sin extensión
+└── missing-metadata/LICENSE         # Sin extensión
+```
 
 ---
 
@@ -180,6 +273,13 @@ release/
 
 ## Estado
 
-Proyecto en desarrollo.
+✅ **Definition of Done completado**
+
+- [x] Walker funcional con exclusión de archivos placeholder
+- [x] 5 analyzers funcionales (empty, duplicates, extensions, size, metadata)
+- [x] Reporter consola + JSON
+- [x] CLI integrado
+- [x] Documentación de reglas de validación (`docs/validation-rules.md`)
+- [x] Casos de prueba incluidos (`test/fixtures/` y `test/run-tests.js`)
 
 Versión actual: **0.1.0**
