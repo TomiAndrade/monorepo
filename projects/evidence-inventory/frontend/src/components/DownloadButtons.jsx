@@ -1,8 +1,8 @@
 function generateCSV(byExtension) {
   const rows = Object.entries(byExtension)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([ext, data]) => `${ext},${data.count},${data.totalSizeBytes},${data.totalSizeMB}`);
-  return ['extension,fileCount,totalSizeBytes,totalSizeMB', ...rows].join('\n');
+    .map(([ext, data]) => `${ext};${data.count};${data.totalSizeBytes};${data.totalSizeMB}`);
+  return ['sep=;\nextension;fileCount;totalSizeBytes;totalSizeMB', ...rows].join('\n');
 }
 
 function downloadBlob(content, filename, type) {
