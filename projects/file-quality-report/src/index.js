@@ -6,6 +6,7 @@ import { resolve } from 'path';
 import { walkDirectory } from './walker.js';
 import { runAllAnalyzers } from './analyzer/index.js';
 import { formatReport, printReport, saveJsonReport } from './reporter/index.js';
+import { loadConfig } from './config.js';
 
 function main() {
   // 1. Determinar directorio objetivo
@@ -34,8 +35,12 @@ function main() {
 
   // 4. Ejecutar flujo: walk → analyze → format → report
   try {
+    const config = loadConfig(resolvedPath);
     const files = walkDirectory(resolvedPath);
-    const results = runAllAnalyzers(files);
+    const results = runAllAnalyzers(files, {
+      allowedExtensions: config.allowedExtensions,
+      errorExtensions: config.errorExtensions,
+    });
     const report = formatReport(results);
 
     // 5. Guardar JSON si se solicitó

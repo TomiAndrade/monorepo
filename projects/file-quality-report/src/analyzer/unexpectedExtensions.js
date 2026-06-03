@@ -8,16 +8,23 @@ const DEFAULT_ALLOWED = [
   '.png', '.jpg', '.jpeg', '.svg', '.pdf',
 ];
 
-export function detectUnexpectedExtensions(files, allowedExtensions = DEFAULT_ALLOWED) {
+export function detectUnexpectedExtensions(files, allowedExtensions = DEFAULT_ALLOWED, errorExtensions = []) {
+  const allowed = allowedExtensions.map(e => e.toLowerCase());
+  const errors = errorExtensions.map(e => e.toLowerCase());
+
   return files
     .filter(({ filePath }) => {
       const ext = extname(filePath).toLowerCase();
-      return ext && !allowedExtensions.includes(ext);
+      return ext && !allowed.includes(ext);
     })
-    .map(({ filePath }) => ({
-      type: 'unexpected_extension',
-      severity: 'warning',
-      file: filePath,
-      message: `Extensión no esperada: ${extname(filePath)}`,
-    }));
+    .map(({ filePath }) => {
+      const ext = extname(filePath).toLowerCase();
+      const isError = errors.includes(ext);
+      return {
+        type: 'unexpected_extension',
+        severity: isError ? 'error' : 'warning',
+        file: filePath,
+        message: `Extensión no esperada: ${extname(filePath)}`,
+      };
+    });
 }

@@ -1,20 +1,20 @@
 // Formatea los resultados del analyzer en un objeto estructurado para reporte
 
 // Remapea severidades según especificación:
-// ERROR → empty, duplicate
-// WARNING → unexpected_extension, too_large, no_extension, invalid_date
+// ERROR → empty, duplicate, unexpected_extension (si errorExtensions lo marca)
+// WARNING → unexpected_extension (por defecto), too_large, no_extension, invalid_date
 // INFO → too_small
 function remapSeverity(result) {
   const severityMap = {
     empty: 'error',
     duplicate: 'error',
-    unexpected_extension: 'warning',
     too_large: 'warning',
     too_small: 'info',
     no_extension: 'warning',
     invalid_date: 'warning',
   };
-  return severityMap[result.type] || result.severity;
+  // unexpected_extension usa la severidad del analyzer (puede ser 'error' o 'warning' según config)
+  return severityMap[result.type] ?? result.severity;
 }
 
 export function formatReport(results) {

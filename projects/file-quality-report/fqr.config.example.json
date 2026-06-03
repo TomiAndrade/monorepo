@@ -1,0 +1,12 @@
+{
+  "allowedExtensions": [
+    ".js", ".ts", ".jsx", ".tsx",
+    ".json", ".md", ".txt", ".csv",
+    ".html", ".css", ".env", ".gitkeep",
+    ".png", ".jpg", ".jpeg", ".svg", ".pdf"
+  ],
+  "errorExtensions": [
+    ".exe", ".bat", ".cmd", ".dll",
+    ".sh", ".ps1"
+  ]
+}

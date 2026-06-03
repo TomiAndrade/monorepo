@@ -8,7 +8,7 @@ import { detectMissingMetadata } from './missingMetadata.js';
 export function runAllAnalyzers(files, options = {}) {
   const results = [
     ...detectEmptyFiles(files),
-    ...detectUnexpectedExtensions(files, options.allowedExtensions),
+    ...detectUnexpectedExtensions(files, options.allowedExtensions, options.errorExtensions),
     ...detectDuplicates(files),
     ...detectSizeOutliers(files, options.size),
     ...detectMissingMetadata(files),
