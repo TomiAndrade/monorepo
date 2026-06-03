@@ -197,6 +197,30 @@
   background: var(--bg-table-row);
 }
 
+/* DownloadButtons */
+.download-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.download-btn {
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--bg-card);
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.download-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
 /* SummaryCards — value error state */
 .summary-card__value--error {
   color: var(--error-text);
