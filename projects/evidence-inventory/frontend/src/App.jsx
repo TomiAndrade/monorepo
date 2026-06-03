@@ -33,8 +33,8 @@ function App() {
           <SummaryCards results={results} />
           <DownloadButtons results={results} />
           <FileTypeChart byExtension={results.byExtension} />
-          <FileTypeTable byExtension={results.byExtension} />
           <QualityReport quality={results.quality} />
+          <FileTypeTable byExtension={results.byExtension} />
         </>
       )}
     </div>
