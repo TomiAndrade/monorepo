@@ -11,7 +11,7 @@ const RESULTS_FILE = path.join(OUTPUTS_DIR, 'results.json');
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173'
+  origin: [/^http:\/\/localhost:\d+$/],
 }));
 app.use(express.json());
 
