@@ -21,6 +21,12 @@ chore(scope): descripción
 
 Scope = nombre del proyecto (`evidence-inventory`, `file-quality-report`).
 
+## Verificación de cambios
+
+- **Backend / CLI**: verificar con llamadas directas (curl, node -e, PowerShell Invoke-RestMethod).
+- **Frontend / UI**: no correr el dev server ni tomar screenshots. Dejar la verificación visual al usuario.
+- Confirmar que el código compila sin errores es suficiente para reportar un cambio de frontend como listo.
+
 ## Workflow con GitHub (GitFlow simplificado)
 
 - `main` — producción, solo recibe merges desde `develop`.
