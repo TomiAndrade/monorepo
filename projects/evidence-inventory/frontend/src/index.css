@@ -19,6 +19,12 @@
   --error-bg: #fef2f2;
   --error-border: #fecaca;
   --error-text: #dc2626;
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #b45309;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1d4ed8;
   --shadow: rgba(0, 0, 0, 0.08);
 }
 
@@ -39,6 +45,12 @@
   --error-bg: #2a1010;
   --error-border: #7f1d1d;
   --error-text: #f87171;
+  --warning-bg: #2a2000;
+  --warning-border: #78540a;
+  --warning-text: #fbbf24;
+  --info-bg: #0d1a2e;
+  --info-border: #1e3a5f;
+  --info-text: #60a5fa;
   --shadow: rgba(0, 0, 0, 0.4);
 }
 
