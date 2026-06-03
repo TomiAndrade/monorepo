@@ -2,6 +2,7 @@ const fs = require('fs/promises');
 const fsSync = require('fs');
 const path = require('path');
 const csv = require('fast-csv');
+const { analyzeQuality } = require('./qualityAnalyzer');
 
 /**
  * Scan a directory recursively and collect file statistics
@@ -92,6 +93,8 @@ async function scanDirectory(rootPath) {
         (results.byExtension[ext].totalSizeBytes / (1024 * 1024)).toFixed(2)
       );
     }
+
+    results.quality = await analyzeQuality(rootPath);
 
     return results;
   } catch (error) {

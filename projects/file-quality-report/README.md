@@ -141,6 +141,55 @@ El archivo JSON incluye:
 
 ---
 
+## Configuración de extensiones
+
+El comportamiento de detección de extensiones se puede ajustar creando un archivo `fqr.config.json` en el directorio a analizar (o en el directorio desde donde se corre el comando).
+
+### Crear el archivo de configuración
+
+```bash
+# En el directorio que querés analizar
+touch fqr.config.json
+```
+
+```json
+{
+  "allowedExtensions": [
+    ".js", ".ts", ".jsx", ".tsx",
+    ".json", ".md", ".txt", ".csv",
+    ".html", ".css", ".env", ".gitkeep",
+    ".png", ".jpg", ".jpeg", ".svg", ".pdf"
+  ],
+  "errorExtensions": [
+    ".exe", ".bat", ".cmd", ".dll",
+    ".sh", ".ps1"
+  ]
+}
+```
+
+> Ver [`fqr.config.example.json`](fqr.config.example.json) como punto de partida.
+
+### Opciones disponibles
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `allowedExtensions` | `string[]` | Extensiones que **no** se reportan. Reemplaza la lista por defecto si se define. |
+| `errorExtensions` | `string[]` | Extensiones que se reportan como **Error** en vez de Warning. |
+
+### Comportamiento según configuración
+
+| Situación | Severidad |
+|---|---|
+| Extensión en `allowedExtensions` | No se reporta |
+| Extensión fuera de `allowedExtensions` | **Warning** |
+| Extensión fuera de `allowedExtensions` y dentro de `errorExtensions` | **Error** |
+
+### Ejemplo
+
+Con la config de arriba, un archivo `setup.exe` se reportaría como **Error** en lugar de Warning, porque `.exe` está en `errorExtensions`.
+
+---
+
 ## Ejemplo de salida
 
 ```text
@@ -180,7 +229,7 @@ Resumen:
 | Archivo vacío | `empty` | **Error** | Archivo con tamaño de 0 bytes |
 | Duplicado probable | `duplicate` | **Error** | Archivo con contenido idéntico a otro (hash MD5) |
 | Archivo muy grande | `too_large` | **Warning** | Archivo > 10 MB |
-| Extensión inesperada | `unexpected_extension` | **Warning** | Extensión no en lista permitida |
+| Extensión inesperada | `unexpected_extension` | **Warning** / **Error** | Extensión no en lista permitida (Error si está en `errorExtensions`) |
 | Metadata faltante | `no_extension` | **Warning** | Archivo sin extensión |
 | Fecha inválida | `invalid_date` | **Warning** | Fecha de modificación < año 2000 |
 | Archivo muy pequeño | `too_small` | **Info** | Archivo no vacío < 10 bytes |
@@ -262,7 +311,7 @@ release/
 
 ## Futuras mejoras
 
-- Configuración mediante archivo JSON
+- ~~Configuración mediante archivo JSON~~ ✅
 - Reglas personalizables
 - Reportes HTML
 - Integración con Evidence Inventory

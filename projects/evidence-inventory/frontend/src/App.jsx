@@ -4,6 +4,8 @@ import ScannerForm from './components/ScannerForm'
 import SummaryCards from './components/SummaryCards'
 import FileTypeChart from './components/FileTypeChart'
 import FileTypeTable from './components/FileTypeTable'
+import QualityReport from './components/QualityReport'
+import DownloadButtons from './components/DownloadButtons'
 
 function App() {
   const [results, setResults] = useState(null)
@@ -29,7 +31,9 @@ function App() {
       {results && (
         <>
           <SummaryCards results={results} />
+          <DownloadButtons results={results} />
           <FileTypeChart byExtension={results.byExtension} />
+          <QualityReport quality={results.quality} />
           <FileTypeTable byExtension={results.byExtension} />
         </>
       )}
