@@ -104,6 +104,51 @@
   padding: 10px 14px;
 }
 
+.scanner-form__options-toggle {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.scanner-form__options-toggle:hover {
+  text-decoration: underline;
+}
+
+.scanner-form__options {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.scanner-form__option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scanner-form__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.scanner-form__input--small {
+  flex: none;
+  width: 100px;
+}
+
+.scanner-form__hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
 /* SummaryCards */
 .summary-cards {
   display: grid;
