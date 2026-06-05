@@ -9,7 +9,7 @@ const { analyzeQuality } = require('./qualityAnalyzer');
  * @param {string} rootPath - The root directory path to scan
  * @returns {Promise<Object>} - Scan results object
  */
-async function scanDirectory(rootPath) {
+async function scanDirectory(rootPath, qualityOptions = {}) {
   try {
     // Check if path exists
     const stats = await fs.stat(rootPath);
@@ -94,7 +94,7 @@ async function scanDirectory(rootPath) {
       );
     }
 
-    results.quality = await analyzeQuality(rootPath);
+    results.quality = await analyzeQuality(rootPath, qualityOptions);
 
     return results;
   } catch (error) {

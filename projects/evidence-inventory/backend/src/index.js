@@ -18,13 +18,19 @@ app.use(express.json());
 // POST /api/scan
 app.post('/api/scan', async (req, res) => {
   try {
-    const { path: scanPath } = req.body;
+    const { path: scanPath, maxFileSizeMB, errorExtensions, allowedExtensions } = req.body;
 
     if (!scanPath) {
       return res.status(400).json({ error: 'Se requiere el campo "path" en el body' });
     }
 
-    const results = await scanDirectory(scanPath);
+    const qualityOptions = {
+      ...(maxFileSizeMB != null && { maxFileSizeBytes: maxFileSizeMB * 1024 * 1024 }),
+      ...(errorExtensions && { errorExtensions }),
+      ...(allowedExtensions && { allowedExtensions }),
+    };
+
+    const results = await scanDirectory(scanPath, qualityOptions);
 
     // Save results to outputs/results.json
     await fs.mkdir(OUTPUTS_DIR, { recursive: true });

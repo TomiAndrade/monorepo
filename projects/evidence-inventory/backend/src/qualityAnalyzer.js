@@ -24,10 +24,10 @@ async function _load() {
   return _fqr;
 }
 
-async function analyzeQuality(dirPath) {
+async function analyzeQuality(dirPath, options = {}) {
   const { walkDirectory, runAllAnalyzers, formatReport } = await _load();
   const files = walkDirectory(dirPath);
-  const results = runAllAnalyzers(files);
+  const results = runAllAnalyzers(files, options);
   return formatReport(results);
 }
 
