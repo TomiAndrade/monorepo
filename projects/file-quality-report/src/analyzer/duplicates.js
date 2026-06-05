@@ -11,14 +11,14 @@ function hashFile(filePath) {
   }
 }
 
-const MAX_SIZE_FOR_HASH = 10 * 1024 * 1024; // 10 MB
+const DEFAULT_MAX_SIZE_FOR_HASH = 10 * 1024 * 1024; // 10 MB
 
-export function detectDuplicates(files) {
+export function detectDuplicates(files, maxSizeForHash = DEFAULT_MAX_SIZE_FOR_HASH) {
   const hashMap = new Map();
   const results = [];
 
   for (const { filePath, stats } of files) {
-    if (stats && stats.size > MAX_SIZE_FOR_HASH) continue;
+    if (stats && stats.size > maxSizeForHash) continue;
     const hash = hashFile(filePath);
     if (!hash) continue;
 
