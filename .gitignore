@@ -7,6 +7,7 @@ outputs/*.csv
 .DS_Store
 projects/evidence-inventory/backend/mock-evidence/
 projects/evidence-inventory/backend/outputs/
+projects/evidence-inventory/electron/dist-electron/
 
 # file-quality-report
 projects/file-quality-report/node_modules/
