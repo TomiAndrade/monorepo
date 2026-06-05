@@ -1,15 +1,7 @@
 const sharp = require('sharp');
+const exifr = require('exifr/dist/full.umd.cjs');
 
 const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp', '.tiff', '.bmp', '.avif']);
-
-let _exifr = null;
-async function loadExifr() {
-  if (!_exifr) {
-    const mod = await import('exifr');
-    _exifr = mod.default || mod;
-  }
-  return _exifr;
-}
 
 async function extract(filePath) {
   const warnings = [];
@@ -24,7 +16,6 @@ async function extract(filePath) {
   }
 
   try {
-    const exifr = await loadExifr();
     const exif = await exifr.parse(filePath);
     if (exif) data.exif = exif;
   } catch (err) {

@@ -8,6 +8,7 @@ outputs/*.csv
 projects/evidence-inventory/backend/mock-evidence/
 projects/evidence-inventory/backend/outputs/
 projects/evidence-inventory/electron/dist-electron/
+projects/evidence-inventory/backend/tests/fixtures/files/
 
 # file-quality-report
 projects/file-quality-report/node_modules/
