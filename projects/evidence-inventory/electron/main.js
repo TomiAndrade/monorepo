@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -68,7 +68,8 @@ function createWindow() {
     height: 800,
     title: 'Evidence Inventory',
     webPreferences: {
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     }
   });
 
@@ -86,6 +87,14 @@ function createWindow() {
     );
   }
 }
+
+ipcMain.handle('dialog:selectFolder', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+    title: 'Seleccionar carpeta a escanear',
+  });
+  return canceled ? null : filePaths[0];
+});
 
 app.whenReady().then(async () => {
   startBackend();
