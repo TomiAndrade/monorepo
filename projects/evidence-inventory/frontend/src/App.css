@@ -139,9 +139,36 @@
   color: var(--text-primary);
 }
 
+.scanner-form__size-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .scanner-form__input--small {
   flex: none;
-  width: 100px;
+  width: 90px;
+}
+
+.scanner-form__select {
+  padding: 10px 8px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.3s, color 0.3s;
+}
+
+.scanner-form__select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.scanner-form__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .scanner-form__hint {

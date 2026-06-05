@@ -15,9 +15,12 @@ function ScannerForm({ onResults }) {
   const [error, setError] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
 
-  const [maxFileSizeMB, setMaxFileSizeMB] = useState(10);
+  const [maxFileSize, setMaxFileSize] = useState(10);
+  const [maxFileSizeUnit, setMaxFileSizeUnit] = useState('MB');
   const [errorExtensionsRaw, setErrorExtensionsRaw] = useState('');
   const [allowedExtensionsRaw, setAllowedExtensionsRaw] = useState('');
+
+  const UNIT_TO_MB = { KB: 1 / 1024, MB: 1, GB: 1024, TB: 1024 * 1024 };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -26,7 +29,7 @@ function ScannerForm({ onResults }) {
     setLoading(true);
     setError(null);
 
-    const body = { path: path.trim(), maxFileSizeMB: Number(maxFileSizeMB) };
+    const body = { path: path.trim(), maxFileSizeMB: Number(maxFileSize) * UNIT_TO_MB[maxFileSizeUnit] };
 
     const errorExtensions = parseExtensions(errorExtensionsRaw);
     if (errorExtensions.length > 0) body.errorExtensions = errorExtensions;
@@ -80,14 +83,27 @@ function ScannerForm({ onResults }) {
               <label className="scanner-form__label">
                 Tamaño máximo de archivo a analizar (MB)
               </label>
-              <input
-                className="scanner-form__input scanner-form__input--small"
-                type="number"
-                min="1"
-                value={maxFileSizeMB}
-                onChange={(e) => setMaxFileSizeMB(e.target.value)}
-                disabled={loading}
-              />
+              <div className="scanner-form__size-row">
+                <input
+                  className="scanner-form__input scanner-form__input--small"
+                  type="number"
+                  min="1"
+                  value={maxFileSize}
+                  onChange={(e) => setMaxFileSize(e.target.value)}
+                  disabled={loading}
+                />
+                <select
+                  className="scanner-form__select"
+                  value={maxFileSizeUnit}
+                  onChange={(e) => setMaxFileSizeUnit(e.target.value)}
+                  disabled={loading}
+                >
+                  <option value="KB">KB</option>
+                  <option value="MB">MB</option>
+                  <option value="GB">GB</option>
+                  <option value="TB">TB</option>
+                </select>
+              </div>
               <span className="scanner-form__hint">
                 Archivos más grandes se omiten en la detección de duplicados y se marcan como error.
               </span>
