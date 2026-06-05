@@ -449,3 +449,131 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* MetadataPanel */
+.metadata-panel {
+  background: var(--bg-card);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-bottom: 28px;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+
+.metadata-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.metadata-panel__header:hover {
+  background: var(--bg-table-row);
+}
+
+.metadata-panel__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.metadata-panel__badge--warn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.metadata-panel__toggle {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.metadata-panel__body {
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.metadata-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.metadata-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-table-head);
+  border-bottom: 2px solid var(--border-table);
+  color: var(--text-heading);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.metadata-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border-row);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.metadata-table tr:last-child td {
+  border-bottom: none;
+}
+
+.metadata-table tr:hover td {
+  background: var(--bg-table-row);
+}
+
+.metadata-table__name {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.metadata-table__ext {
+  background: var(--bg-table-head);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.metadata-table__mono {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.metadata-table__empty {
+  color: var(--text-secondary);
+}
+
+.metadata-table__warn {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: help;
+  white-space: nowrap;
+}
+
+.metadata-table__ok {
+  color: var(--accent);
+  font-weight: 700;
+}
