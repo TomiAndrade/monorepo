@@ -17,6 +17,10 @@ function startBackend() {
   console.log('[Backend] resourcesPath:', process.resourcesPath);
   backendProcess = spawn('node', ['src/index.js'], {
     cwd: backendCwd,
+    env: {
+      ...process.env,
+      ELECTRON_RESOURCES_PATH: isDev ? '' : process.resourcesPath,
+    },
   });
 
   backendProcess.stdout.on('data', (data) => {
