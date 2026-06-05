@@ -15,6 +15,13 @@ function ScannerForm({ onResults }) {
   const [error, setError] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
 
+  const isElectron = Boolean(window.electronAPI);
+
+  async function handleSelectFolder() {
+    const selected = await window.electronAPI.selectFolder();
+    if (selected) setPath(selected);
+  }
+
   const [maxFileSize, setMaxFileSize] = useState(10);
   const [maxFileSizeUnit, setMaxFileSizeUnit] = useState('MB');
   const [errorExtensionsRaw, setErrorExtensionsRaw] = useState('');
@@ -52,6 +59,16 @@ function ScannerForm({ onResults }) {
     <div className="scanner-form">
       <form onSubmit={handleSubmit}>
         <div className="scanner-form__row">
+          {isElectron && (
+            <button
+              type="button"
+              className="scanner-form__button scanner-form__button--secondary"
+              onClick={handleSelectFolder}
+              disabled={loading}
+            >
+              Examinar...
+            </button>
+          )}
           <input
             className="scanner-form__input"
             type="text"
