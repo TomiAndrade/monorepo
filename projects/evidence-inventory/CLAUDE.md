@@ -90,3 +90,16 @@ cd electron && npm run build   # genera electron/dist-electron/*.exe
 ```
 
 Electron Builder genera un `.exe` instalable (NSIS) y uno portable. Artefactos en `electron/dist-electron/`.
+
+## Problema conocido: build falla con "app.asar locked"
+
+**Error:** `remove dist-electron\win-unpacked\resources\app.asar: The process cannot access the file because it is being used by another process`
+
+**Causa:** Windows (Defender, SearchIndexer, SmartScreen u otro proceso de seguridad) lockea `app.asar` en el instante que electron-builder lo crea, antes de que `app-builder.exe` pueda reemplazarlo.
+
+**Soluciones que funcionan:**
+1. **Reiniciar la PC** antes de hacer el build (limpia locks residuales).
+2. **Agregar exclusión en Windows Defender** para el directorio raíz del monorepo (`C:\Users\tomas\monorepo`), no solo `dist-electron`.
+3. **Correr el build como Administrador** desde una terminal elevada.
+
+**Lo que NO funciona:** downgrade de electron-builder, `asar: false`, pre-extraer el zip de Electron manualmente, `ELECTRON_OVERRIDE_DIST_PATH`, matar procesos node. El problema es del entorno Windows, no del código.
