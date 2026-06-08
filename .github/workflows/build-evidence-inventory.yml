@@ -3,6 +3,7 @@ name: Build Evidence Inventory
 on:
   push:
     branches: [main]
+    tags: ['v*']
     paths:
       - 'projects/evidence-inventory/**'
       - 'projects/file-quality-report/**'
@@ -74,3 +75,28 @@ jobs:
           path: |
             projects/evidence-inventory/electron/dist-electron/*.dmg
             projects/evidence-inventory/electron/dist-electron/*.blockmap
+
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: evidence-inventory-windows
+          path: release-assets
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: evidence-inventory-macos
+          path: release-assets
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
