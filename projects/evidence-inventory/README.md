@@ -91,6 +91,61 @@ extension,fileCount,totalSizeBytes,totalSizeMB
 
 > Las filas están ordenadas alfabéticamente por extensión.
 
+## Pipeline de Ingesta y Validación
+
+El pipeline ejecuta los siguientes pasos en secuencia cada vez que se llama a `POST /api/scan`:
+
+1. **Inventario** — recorre el directorio recursivamente, contabiliza archivos por extensión y detecta carpetas vacías.
+2. **Metadata** — extrae datos técnicos por tipo: dimensiones + EXIF (imágenes), páginas (PDFs), resolución + duración (videos, requiere `ffprobe`).
+3. **Calidad** — aplica reglas configurables: archivos vacíos, extensiones prohibidas, tamaño excesivo.
+4. **Persistencia** — guarda los resultados consolidados y genera los archivos de salida.
+
+### Ejecución
+
+```bash
+# Lanzar el backend
+cd projects/evidence-inventory/backend
+npm start
+
+# Desde otra terminal o desde la UI, disparar un scan:
+# (PowerShell)
+Invoke-RestMethod -Uri http://localhost:3001/api/scan `
+  -Method POST -ContentType "application/json" `
+  -Body '{"path":"C:\\ruta\\a\\escanear"}'
+```
+
+### Salidas generadas
+
+| Archivo | Descripción |
+|---|---|
+| `outputs/results.json` | Resultado completo: inventario, metadata por archivo, calidad |
+| `outputs/summary.txt` | Resumen legible: totales, tipos, problemas de calidad |
+| `outputs/pipeline.log` | Log estructurado `[Pipeline][INFO/WARN/ERROR]` de cada ejecución |
+
+### Ejemplo de summary.txt
+
+```
+Pipeline ejecutado correctamente
+
+Ruta escaneada:   C:\proyecto\evidencias
+Fecha:            08/06/2026, 15:30:00
+
+Archivos totales: 291
+Tamaño total:     2.17 GB
+Carpetas vacías:  3
+
+Imágenes: 54
+PDFs:     46
+Videos:   0
+
+Problemas de calidad: 22
+  Errores:      19
+  Advertencias: 3
+  Info:         0
+```
+
+---
+
 ## Supuestos y limitaciones
 - Los archivos sin extensión se agrupan bajo la clave `.no-extension`
 - Archivos de 0 bytes muestran `0.00 MB` (es correcto, no es un error)

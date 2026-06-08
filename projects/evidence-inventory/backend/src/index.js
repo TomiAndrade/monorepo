@@ -3,6 +3,8 @@ const cors = require('cors');
 const fs = require('fs/promises');
 const path = require('path');
 const { scanDirectory, exportResults } = require('./scanner');
+const logger = require('./pipeline/PipelineLogger');
+const { generateSummary } = require('./pipeline/SummaryGenerator');
 
 const app = express();
 const PORT = 3001;
@@ -30,14 +32,40 @@ app.post('/api/scan', async (req, res) => {
       ...(allowedExtensions && { allowedExtensions }),
     };
 
+    logger.info(`Scan iniciado: ${scanPath}`);
+
     const results = await scanDirectory(scanPath, qualityOptions);
+
+    // Aggregate metadata warnings into pipeline errors for reporting
+    const pipelineErrors = [];
+    for (const file of results.files ?? []) {
+      for (const w of file.metadata?.warnings ?? []) {
+        pipelineErrors.push({
+          stage: 'metadata',
+          file: file.path,
+          message: w,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+    if (pipelineErrors.length > 0) {
+      results.pipelineErrors = pipelineErrors;
+      logger.warn(`${pipelineErrors.length} advertencia(s) de metadata durante el escaneo`);
+    }
+
+    const q = results.quality?.summary;
+    logger.info(`Scan completado: ${results.totalFiles} archivos, calidad: ${q?.errors ?? 0} error(es), ${q?.warnings ?? 0} advertencia(s)`);
 
     // Save results to outputs/results.json
     await fs.mkdir(OUTPUTS_DIR, { recursive: true });
     await fs.writeFile(RESULTS_FILE, JSON.stringify(results, null, 2), 'utf-8');
 
+    // Generate human-readable summary
+    await generateSummary(results);
+
     res.json(results);
   } catch (error) {
+    logger.error(error.message);
     if (error.message.includes('does not exist') || error.message.includes('not a directory')) {
       return res.status(400).json({ error: error.message });
     }
