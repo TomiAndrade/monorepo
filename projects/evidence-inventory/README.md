@@ -69,24 +69,60 @@ Ejemplo real basado en el escaneo de `mock-evidence/`:
     ".json": { "count": 1, "totalSizeBytes": 77, "totalSizeMB": 0 },
     ".mp4": { "count": 1, "totalSizeBytes": 77, "totalSizeMB": 0 },
     ".txt": { "count": 1, "totalSizeBytes": 56, "totalSizeMB": 0 }
+  },
+  "files": [
+    {
+      "path": "C:\\...\\mock-evidence\\foto.jpg",
+      "type": ".jpg",
+      "metadata": {
+        "fileName": "foto.jpg",
+        "extension": ".jpg",
+        "sizeBytes": 74,
+        "modifiedAt": "2024-06-15T08:00:00.000Z",
+        "width": 10,
+        "height": 10
+      }
+    },
+    {
+      "path": "C:\\...\\mock-evidence\\informe.pdf",
+      "type": ".pdf",
+      "metadata": {
+        "fileName": "informe.pdf",
+        "extension": ".pdf",
+        "sizeBytes": 79,
+        "modifiedAt": "2024-06-15T08:00:00.000Z",
+        "pageCount": 1
+      }
+    }
+  ],
+  "quality": {
+    "summary": { "total": 8, "errors": 2, "warnings": 5, "infos": 1 },
+    "sections": [{ "title": "Errores", "severity": "error", "items": ["..."] }],
+    "suggestedActions": ["..."],
+    "generatedAt": "2026-06-08T15:30:00.000Z",
+    "version": "1.0.0"
   }
 }
 ```
+
+> `pipelineErrors` es un campo opcional que solo aparece cuando algún extractor de metadata reporta advertencias. Contiene una lista plana de `{ stage, file, message, timestamp }`.
+
 
 ## Estructura del CSV de salida
 
 Ejemplo real basado en el escaneo de `mock-evidence/`:
 
 ```
-extension,fileCount,totalSizeBytes,totalSizeMB
-.csv,2,158,0
-.docx,2,161,0
-.jpg,3,222,0
-.json,1,77,0
-.mp4,1,77,0
-.pdf,3,237,0
-.png,2,154,0
-.txt,1,56,0
+sep=;
+extension;fileCount;totalSizeBytes;totalSizeMB
+.csv;2;158;0
+.docx;2;161;0
+.jpg;3;222;0
+.json;1;77;0
+.mp4;1;77;0
+.pdf;3;237;0
+.png;2;154;0
+.txt;1;56;0
 ```
 
 > Las filas están ordenadas alfabéticamente por extensión.
