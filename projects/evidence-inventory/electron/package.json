@@ -15,14 +15,12 @@
     },
     "files": [
       "main.js",
-      "../backend/src/**/*",
-      "../backend/package.json",
-      "../backend/node_modules/**/*",
-      "../frontend/dist/**/*"
+      "preload.js"
     ],
     "extraResources": [
       { "from": "../backend", "to": "backend" },
-      { "from": "../frontend/dist", "to": "frontend/dist" }
+      { "from": "../frontend/dist", "to": "frontend/dist" },
+      { "from": "../../file-quality-report/src", "to": "file-quality-report/src" }
     ],
     "nsis": {
       "oneClick": false,
@@ -33,14 +31,8 @@
     },
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        },
-        {
-          "target": "portable",
-          "arch": ["x64"]
-        }
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
       ],
       "signAndEditExecutable": false
     }

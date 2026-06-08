@@ -8,23 +8,29 @@ const DEFAULT_ALLOWED = [
   '.png', '.jpg', '.jpeg', '.svg', '.pdf',
 ];
 
-export function detectUnexpectedExtensions(files, allowedExtensions = DEFAULT_ALLOWED, errorExtensions = []) {
-  const allowed = allowedExtensions.map(e => e.toLowerCase());
-  const errors = errorExtensions.map(e => e.toLowerCase());
+export function detectUnexpectedExtensions(files, allowedExtensions = [], errorExtensions = []) {
+  const errors = new Set(errorExtensions.map(e => e.toLowerCase()));
+  const allowed = new Set([...DEFAULT_ALLOWED, ...allowedExtensions].map(e => e.toLowerCase()));
 
-  return files
-    .filter(({ filePath }) => {
-      const ext = extname(filePath).toLowerCase();
-      return ext && !allowed.includes(ext);
-    })
-    .map(({ filePath }) => {
-      const ext = extname(filePath).toLowerCase();
-      const isError = errors.includes(ext);
-      return {
+  const results = [];
+  for (const { filePath } of files) {
+    const ext = extname(filePath).toLowerCase();
+    if (!ext) continue;
+    if (errors.has(ext)) {
+      results.push({
         type: 'unexpected_extension',
-        severity: isError ? 'error' : 'warning',
+        severity: 'error',
         file: filePath,
-        message: `Extensión no esperada: ${extname(filePath)}`,
-      };
-    });
+        message: `Extensión no permitida: ${ext}`,
+      });
+    } else if (!allowed.has(ext)) {
+      results.push({
+        type: 'unexpected_extension',
+        severity: 'warning',
+        file: filePath,
+        message: `Extensión no esperada: ${ext}`,
+      });
+    }
+  }
+  return results;
 }

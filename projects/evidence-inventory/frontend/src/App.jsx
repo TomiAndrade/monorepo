@@ -6,6 +6,7 @@ import FileTypeChart from './components/FileTypeChart'
 import FileTypeTable from './components/FileTypeTable'
 import QualityReport from './components/QualityReport'
 import DownloadButtons from './components/DownloadButtons'
+import MetadataPanel from './components/MetadataPanel'
 
 function App() {
   const [results, setResults] = useState(null)
@@ -35,6 +36,7 @@ function App() {
           <FileTypeChart byExtension={results.byExtension} />
           <QualityReport quality={results.quality} />
           <FileTypeTable byExtension={results.byExtension} />
+          <MetadataPanel files={results.files} />
         </>
       )}
     </div>

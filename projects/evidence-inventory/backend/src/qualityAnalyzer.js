@@ -3,9 +3,17 @@ const { pathToFileURL } = require('url');
 
 let _fqr = null;
 
+function getFqrBase() {
+  if (process.env.ELECTRON_RESOURCES_PATH) {
+    return path.join(process.env.ELECTRON_RESOURCES_PATH, 'file-quality-report', 'src');
+  }
+  // Dev: __dirname is .../projects/evidence-inventory/backend/src → ../../../ reaches projects/
+  return path.resolve(__dirname, '../../../file-quality-report/src');
+}
+
 async function _load() {
   if (_fqr) return _fqr;
-  const fqrBase = path.resolve(__dirname, '../../../file-quality-report/src');
+  const fqrBase = getFqrBase();
   const toUrl = (p) => pathToFileURL(p).href;
   const [{ walkDirectory }, { runAllAnalyzers }, { formatReport }] = await Promise.all([
     import(toUrl(path.join(fqrBase, 'walker.js'))),
@@ -16,10 +24,10 @@ async function _load() {
   return _fqr;
 }
 
-async function analyzeQuality(dirPath) {
+async function analyzeQuality(dirPath, options = {}) {
   const { walkDirectory, runAllAnalyzers, formatReport } = await _load();
   const files = walkDirectory(dirPath);
-  const results = runAllAnalyzers(files);
+  const results = runAllAnalyzers(files, options);
   return formatReport(results);
 }
 
