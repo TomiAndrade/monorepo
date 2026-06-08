@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win"
+    "build": "electron-builder --win",
+    "build:mac": "electron-builder --mac"
   },
   "build": {
     "appId": "com.tomiandrade.evidence-inventory",
@@ -35,6 +36,12 @@
         { "target": "portable", "arch": ["x64"] }
       ],
       "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "category": "public.app-category.productivity"
     }
   },
   "devDependencies": {
