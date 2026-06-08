@@ -3,13 +3,14 @@ const fsSync = require('fs');
 const path = require('path');
 const csv = require('fast-csv');
 const { analyzeQuality } = require('./qualityAnalyzer');
+const { extractMetadata } = require('./metadata/MetadataExtractor');
 
 /**
  * Scan a directory recursively and collect file statistics
  * @param {string} rootPath - The root directory path to scan
  * @returns {Promise<Object>} - Scan results object
  */
-async function scanDirectory(rootPath) {
+async function scanDirectory(rootPath, qualityOptions = {}) {
   try {
     // Check if path exists
     const stats = await fs.stat(rootPath);
@@ -26,6 +27,7 @@ async function scanDirectory(rootPath) {
     };
 
     const emptyFolders = new Set();
+    const collectedFiles = [];
 
     // Recursive scan function — returns true if the directory contains any real files
     async function scanDir(dirPath, relativePath = '') {
@@ -64,6 +66,8 @@ async function scanDirectory(rootPath) {
 
             results.byExtension[ext].count++;
             results.byExtension[ext].totalSizeBytes += fileSize;
+
+            collectedFiles.push({ fullPath, fileStats, ext });
           }
         }
 
@@ -94,7 +98,15 @@ async function scanDirectory(rootPath) {
       );
     }
 
-    results.quality = await analyzeQuality(rootPath);
+    results.files = await Promise.all(
+      collectedFiles.map(async ({ fullPath, fileStats, ext }) => ({
+        path: fullPath,
+        type: ext,
+        metadata: await extractMetadata(fullPath, fileStats),
+      }))
+    );
+
+    results.quality = await analyzeQuality(rootPath, qualityOptions);
 
     return results;
   } catch (error) {

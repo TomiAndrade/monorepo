@@ -1,0 +1,76 @@
+name: Build Evidence Inventory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/evidence-inventory/**'
+      - 'projects/file-quality-report/**'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend deps
+        working-directory: projects/evidence-inventory/frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: projects/evidence-inventory/frontend
+        run: npm run build
+
+      - name: Install electron deps
+        working-directory: projects/evidence-inventory/electron
+        run: npm install
+
+      - name: Build Windows
+        working-directory: projects/evidence-inventory/electron
+        run: npm run build
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-inventory-windows
+          path: |
+            projects/evidence-inventory/electron/dist-electron/*.exe
+            projects/evidence-inventory/electron/dist-electron/*.blockmap
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend deps
+        working-directory: projects/evidence-inventory/frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: projects/evidence-inventory/frontend
+        run: npm run build
+
+      - name: Install electron deps
+        working-directory: projects/evidence-inventory/electron
+        run: npm install
+
+      - name: Build macOS
+        working-directory: projects/evidence-inventory/electron
+        run: npm run build:mac
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-inventory-macos
+          path: |
+            projects/evidence-inventory/electron/dist-electron/*.dmg
+            projects/evidence-inventory/electron/dist-electron/*.blockmap

@@ -6,11 +6,12 @@ import { detectSizeOutliers } from './sizeOutliers.js';
 import { detectMissingMetadata } from './missingMetadata.js';
 
 export function runAllAnalyzers(files, options = {}) {
+  const maxFileSizeBytes = options.maxFileSizeBytes;
   const results = [
     ...detectEmptyFiles(files),
     ...detectUnexpectedExtensions(files, options.allowedExtensions, options.errorExtensions),
-    ...detectDuplicates(files),
-    ...detectSizeOutliers(files, options.size),
+    ...detectDuplicates(files, maxFileSizeBytes),
+    ...detectSizeOutliers(files, maxFileSizeBytes != null ? { maxSizeBytes: maxFileSizeBytes } : options.size),
     ...detectMissingMetadata(files),
   ];
 
