@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Mundial",
+    "slug": "mundial-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "mundial",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0B6E4F"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router"],
+    "extra": {
+      "apiBaseUrl": "http://localhost:3001"
+    }
+  }
+}
