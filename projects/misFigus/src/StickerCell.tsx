@@ -12,36 +12,59 @@ export function StickerCell({ sticker, value, onChange }: Props) {
   const owned = value >= 1;
   const repes = value >= 2 ? value - 1 : 0;
 
-  function handlePress() {
+  function handleMark() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onChange(sticker.code, 1);
+  }
+
+  function handlePlus() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onChange(sticker.code, value + 1);
   }
 
-  function handleLongPress() {
-    if (value === 0) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    onChange(sticker.code, 0);
+  function handleMinus() {
+    Haptics.impactAsync(
+      value === 1
+        ? Haptics.ImpactFeedbackStyle.Medium
+        : Haptics.ImpactFeedbackStyle.Light
+    );
+    onChange(sticker.code, value - 1);
+  }
+
+  if (!owned) {
+    return (
+      <Pressable
+        style={({ pressed }) => [styles.cell, styles.cellMissing, pressed && styles.cellPressed]}
+        onPress={handleMark}
+      >
+        <Text style={[styles.code, styles.codeMissing]}>{sticker.code}</Text>
+      </Pressable>
+    );
   }
 
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.cell,
-        owned ? styles.cellOwned : styles.cellMissing,
-        pressed && styles.cellPressed,
-      ]}
-      onPress={handlePress}
-      onLongPress={handleLongPress}
-    >
-      <Text style={[styles.code, owned ? styles.codeOwned : styles.codeMissing]}>
-        {sticker.code}
-      </Text>
+    <View style={[styles.cell, styles.cellOwned]}>
+      <Text style={[styles.code, styles.codeOwned]}>{sticker.code}</Text>
       {repes > 0 && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>×{repes}</Text>
         </View>
       )}
-    </Pressable>
+      {/* Mitad izquierda — quitar */}
+      <Pressable
+        style={({ pressed }) => [styles.half, styles.halfLeft, pressed && styles.halfActive]}
+        onPress={handleMinus}
+      >
+        <Text style={styles.halfText}>−</Text>
+      </Pressable>
+      {/* Mitad derecha — agregar */}
+      <Pressable
+        style={({ pressed }) => [styles.half, styles.halfRight, pressed && styles.halfActive]}
+        onPress={handlePlus}
+      >
+        <Text style={styles.halfText}>+</Text>
+      </Pressable>
+    </View>
   );
 }
 
@@ -63,6 +86,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0d2d1a',
     borderColor: '#4ade80',
   },
+  cellPressed: {
+    opacity: 0.6,
+  },
   code: {
     fontSize: 10,
     fontWeight: '500',
@@ -72,9 +98,6 @@ const styles = StyleSheet.create({
   },
   codeOwned: {
     color: '#4ade80',
-  },
-  cellPressed: {
-    opacity: 0.6,
   },
   badge: {
     position: 'absolute',
@@ -89,5 +112,29 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 7,
     fontWeight: 'bold',
+  },
+  half: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: '42%',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 3,
+  },
+  halfLeft: {
+    left: 0,
+  },
+  halfRight: {
+    right: 0,
+  },
+  halfActive: {
+    backgroundColor: 'rgba(74, 222, 128, 0.18)',
+  },
+  halfText: {
+    color: '#4ade80',
+    fontSize: 14,
+    fontWeight: 'bold',
+    lineHeight: 14,
   },
 });
