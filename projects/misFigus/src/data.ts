@@ -13,7 +13,7 @@ export type StickerSection = {
   data: Sticker[][];
 };
 
-const FLAGS = banderas as Record<string, string>;
+export const FLAGS = banderas as Record<string, string>;
 
 // Group stickers into rows of COLS for the grid
 const COLS = 5;
