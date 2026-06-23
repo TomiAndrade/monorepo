@@ -1,34 +1,45 @@
 import * as Haptics from 'expo-haptics';
+import { useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Sticker } from './data';
 
 type Props = {
   sticker: Sticker;
   value: number;
-  onChange: (code: string, value: number) => void;
-  onSelect: (code: string) => void;
+  subtractActive: boolean;
+  onTap: (code: string) => void;
+  onReset: (code: string) => void;
+  onOpenSubtract: (code: string) => void;
 };
 
-export function StickerCell({ sticker, value, onChange, onSelect }: Props) {
+export function StickerCell({
+  sticker, value, subtractActive, onTap, onReset, onOpenSubtract,
+}: Props) {
   const owned = value >= 1;
   const repes = value >= 2 ? value - 1 : 0;
+  // Evita que onPress se dispare al soltar un long-press
+  const longPressTriggered = useRef(false);
 
   function handlePress() {
-    if (!owned) {
-      // único tap que cambia cantidad: falta → tengo
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      onChange(sticker.code, 1);
-    } else {
-      // abre controles +/−
-      onSelect(sticker.code);
+    if (longPressTriggered.current) {
+      longPressTriggered.current = false;
+      return;
     }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onTap(sticker.code);
   }
 
   function handleLongPress() {
-    if (!owned) return;
-    // único camino para volver a 0
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    onChange(sticker.code, 0);
+    longPressTriggered.current = true;
+    if (!owned) return; // falta: no hace nada
+    if (value === 1) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      onReset(sticker.code);
+    } else {
+      // value >= 2: abre control de resta
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      onOpenSubtract(sticker.code);
+    }
   }
 
   return (
@@ -36,11 +47,12 @@ export function StickerCell({ sticker, value, onChange, onSelect }: Props) {
       style={({ pressed }) => [
         styles.cell,
         owned ? styles.cellOwned : styles.cellMissing,
+        subtractActive && styles.cellSubtractActive,
         pressed && styles.cellPressed,
       ]}
       onPress={handlePress}
       onLongPress={handleLongPress}
-      delayLongPress={500}
+      delayLongPress={400}
     >
       <Text style={[styles.code, owned ? styles.codeOwned : styles.codeMissing]}>
         {sticker.code}
@@ -71,6 +83,10 @@ const styles = StyleSheet.create({
   cellOwned: {
     backgroundColor: '#0d2d1a',
     borderColor: '#4ade80',
+  },
+  cellSubtractActive: {
+    borderColor: '#fff',
+    borderWidth: 2,
   },
   cellPressed: {
     opacity: 0.6,
