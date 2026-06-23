@@ -1,7 +1,16 @@
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { SECTIONS, TOTAL, type Sticker } from '../../src/data';
+import { useColeccion } from '../../src/useColeccion';
 
 export default function ColeccionScreen() {
+  const { coleccion, loaded } = useColeccion();
+
+  const owned = Object.values(coleccion).filter((v) => v >= 1).length;
+
+  function ownedInSection(stickers: Sticker[][]): number {
+    return stickers.flat().filter((s) => (coleccion[s.code] ?? 0) >= 1).length;
+  }
+
   return (
     <View style={styles.container}>
       <SectionList
@@ -14,7 +23,7 @@ export default function ColeccionScreen() {
               {section.flag} {section.title}
             </Text>
             <Text style={styles.sectionCount}>
-              0 / {section.data.flat().length}
+              {loaded ? ownedInSection(section.data) : '—'} / {section.data.flat().length}
             </Text>
           </View>
         )}
@@ -30,7 +39,9 @@ export default function ColeccionScreen() {
         ListHeaderComponent={
           <View style={styles.header}>
             <Text style={styles.headerTitle}>misFigus WC2026</Text>
-            <Text style={styles.headerSub}>0 / {TOTAL} figuritas</Text>
+            <Text style={styles.headerSub}>
+              {loaded ? owned : '—'} / {TOTAL} figuritas
+            </Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
