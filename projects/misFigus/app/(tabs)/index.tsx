@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLS_COUNT, SECTIONS, TOTAL, type Sticker, type StickerSection } from '../../src/data';
 import { StickerCell } from '../../src/StickerCell';
@@ -13,24 +13,22 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'repes', label: 'Repes' },
 ];
 
-const EMPTY_MSG: Record<Filter, string> = {
-  todas: '',
-  faltan: '¡Colección completa!',
-  repes: 'No tenés repetidas todavía',
-};
-
 export default function ColeccionScreen() {
   const { coleccion, loaded, setSticker } = useColeccion();
   const [filter, setFilter] = useState<Filter>('todas');
+  const [search, setSearch] = useState('');
   const insets = useSafeAreaInsets();
 
   const owned = Object.values(coleccion).filter((v) => v >= 1).length;
   const progress = TOTAL > 0 ? owned / TOTAL : 0;
+  const pct = Math.round(progress * 100);
 
   const filteredSections = useMemo(() => {
-    if (filter === 'todas') return SECTIONS;
+    const q = search.trim().toLowerCase();
     return SECTIONS
+      .filter((s) => !q || s.title.toLowerCase().includes(q))
       .map((section) => {
+        if (filter === 'todas') return section;
         const flat = section.data.flat().filter((s) => {
           const v = coleccion[s.code] ?? 0;
           return filter === 'faltan' ? v === 0 : v >= 2;
@@ -43,7 +41,7 @@ export default function ColeccionScreen() {
         return { ...section, data: chunks };
       })
       .filter((s): s is StickerSection => s !== null);
-  }, [filter, coleccion]);
+  }, [filter, coleccion, search]);
 
   function sectionCountLabel(sectionData: Sticker[][]): string {
     const flat = sectionData.flat();
@@ -60,10 +58,35 @@ export default function ColeccionScreen() {
     return flat.length > 0 && flat.every((s) => (coleccion[s.code] ?? 0) >= 1);
   }
 
-  const pct = Math.round(progress * 100);
+  function emptyMsg(): string {
+    if (search.trim()) return 'Sin resultados';
+    if (filter === 'faltan') return '¡Colección completa!';
+    if (filter === 'repes') return 'No tenés repetidas todavía';
+    return '';
+  }
 
   return (
     <View style={styles.container}>
+      {/* Barra de búsqueda fija — siempre visible */}
+      <View style={[styles.searchBar, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.searchInputWrapper}>
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Buscar equipo..."
+            placeholderTextColor="#333"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {search.length > 0 && (
+            <Pressable onPress={() => setSearch('')} style={styles.searchClear} hitSlop={8}>
+              <Text style={styles.searchClearText}>✕</Text>
+            </Pressable>
+          )}
+        </View>
+      </View>
+
       <SectionList
         sections={filteredSections}
         keyExtractor={(_row, rowIndex) => String(rowIndex)}
@@ -97,7 +120,7 @@ export default function ColeccionScreen() {
           </View>
         )}
         ListHeaderComponent={
-          <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+          <View style={styles.header}>
             <Text style={styles.headerTitle}>misFigus WC2026</Text>
             <View style={styles.headerSubRow}>
               <Text style={styles.headerSub}>
@@ -124,13 +147,12 @@ export default function ColeccionScreen() {
           </View>
         }
         ListEmptyComponent={
-          filter !== 'todas' ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>{EMPTY_MSG[filter]}</Text>
-            </View>
-          ) : null
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>{emptyMsg()}</Text>
+          </View>
         }
         contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
       />
     </View>
   );
@@ -141,11 +163,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0a0a0a',
   },
+  searchBar: {
+    backgroundColor: '#0a0a0a',
+    paddingHorizontal: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1a1a1a',
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#141414',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    paddingHorizontal: 12,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    color: '#fff',
+    fontSize: 15,
+  },
+  searchClear: {
+    padding: 4,
+  },
+  searchClearText: {
+    color: '#555',
+    fontSize: 13,
+  },
   listContent: {
     paddingBottom: 32,
   },
   header: {
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 12,
   },
   headerTitle: {
