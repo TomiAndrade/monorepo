@@ -1,9 +1,10 @@
 import { SectionList, StyleSheet, Text, View } from 'react-native';
 import { SECTIONS, TOTAL, type Sticker } from '../../src/data';
+import { StickerCell } from '../../src/StickerCell';
 import { useColeccion } from '../../src/useColeccion';
 
 export default function ColeccionScreen() {
-  const { coleccion, loaded } = useColeccion();
+  const { coleccion, loaded, setSticker } = useColeccion();
 
   const owned = Object.values(coleccion).filter((v) => v >= 1).length;
 
@@ -30,9 +31,12 @@ export default function ColeccionScreen() {
         renderItem={({ item: row }) => (
           <View style={styles.row}>
             {row.map((sticker: Sticker) => (
-              <View key={sticker.code} style={styles.cell}>
-                <Text style={styles.cellCode}>{sticker.code}</Text>
-              </View>
+              <StickerCell
+                key={sticker.code}
+                sticker={sticker}
+                value={coleccion[sticker.code] ?? 0}
+                onChange={setSticker}
+              />
             ))}
           </View>
         )}
@@ -97,20 +101,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     gap: 4,
-  },
-  cell: {
-    flex: 1,
-    aspectRatio: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  cellCode: {
-    color: '#444',
-    fontSize: 10,
-    fontWeight: '500',
   },
 });
