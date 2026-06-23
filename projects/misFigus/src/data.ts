@@ -15,6 +15,61 @@ export type StickerSection = {
 
 export const FLAGS = banderas as Record<string, string>;
 
+const TEAM_ES: Record<string, string> = {
+  'We Are Panini': 'We Are Panini',
+  'FIFA World Cup 2026': 'Copa Mundial FIFA 2026',
+  'FIFA World Cup History': 'Historia Copa Mundial FIFA',
+  'Host Countries and Cities': 'Sedes y Ciudades',
+  'Algeria': 'Argelia',
+  'Argentina': 'Argentina',
+  'Australia': 'Australia',
+  'Austria': 'Austria',
+  'Belgium': 'Bélgica',
+  'Bosnia and Herzegovina': 'Bosnia y Herzegovina',
+  'Brazil': 'Brasil',
+  'Canada': 'Canadá',
+  'Cape Verde': 'Cabo Verde',
+  'Colombia': 'Colombia',
+  'Congo DR': 'Congo RD',
+  'Croatia': 'Croacia',
+  'Curaçao': 'Curazao',
+  'Czechia': 'Chequia',
+  'Ecuador': 'Ecuador',
+  'Egypt': 'Egipto',
+  'England': 'Inglaterra',
+  'France': 'Francia',
+  'Germany': 'Alemania',
+  'Ghana': 'Ghana',
+  'Haiti': 'Haití',
+  'Iran': 'Irán',
+  'Iraq': 'Irak',
+  'Ivory Coast': 'Costa de Marfil',
+  'Japan': 'Japón',
+  'Jordan': 'Jordania',
+  'Mexico': 'México',
+  'Morocco': 'Marruecos',
+  'Netherlands': 'Países Bajos',
+  'New Zealand': 'Nueva Zelanda',
+  'Norway': 'Noruega',
+  'Panama': 'Panamá',
+  'Paraguay': 'Paraguay',
+  'Portugal': 'Portugal',
+  'Qatar': 'Catar',
+  'Saudi Arabia': 'Arabia Saudita',
+  'Scotland': 'Escocia',
+  'Senegal': 'Senegal',
+  'South Africa': 'Sudáfrica',
+  'South Korea': 'Corea del Sur',
+  'Spain': 'España',
+  'Sweden': 'Suecia',
+  'Switzerland': 'Suiza',
+  'Türkiye': 'Turquía',
+  'Tunisia': 'Túnez',
+  'Uruguay': 'Uruguay',
+  'USA': 'EE. UU.',
+  'Uzbekistan': 'Uzbekistán',
+};
+
 // Group stickers into rows of COLS for the grid
 const COLS = 5;
 
@@ -39,7 +94,7 @@ function buildSections(): StickerSection[] {
   }
 
   return teamOrder.map((team) => ({
-    title: team,
+    title: TEAM_ES[team] ?? team,
     flag: FLAGS[team] ?? '🏳️',
     data: chunkArray(teamMap.get(team)!, COLS),
   }));
