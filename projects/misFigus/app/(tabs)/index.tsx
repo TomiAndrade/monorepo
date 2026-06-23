@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLS_COUNT, SECTIONS, TOTAL, type Sticker, type StickerSection } from '../../src/data';
 import { StickerCell } from '../../src/StickerCell';
 import { useColeccion } from '../../src/useColeccion';
@@ -12,9 +13,16 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'repes', label: 'Repes' },
 ];
 
+const EMPTY_MSG: Record<Filter, string> = {
+  todas: '',
+  faltan: '¡Colección completa!',
+  repes: 'No tenés repetidas todavía',
+};
+
 export default function ColeccionScreen() {
   const { coleccion, loaded, setSticker } = useColeccion();
   const [filter, setFilter] = useState<Filter>('todas');
+  const insets = useSafeAreaInsets();
 
   const owned = Object.values(coleccion).filter((v) => v >= 1).length;
   const progress = TOTAL > 0 ? owned / TOTAL : 0;
@@ -46,22 +54,33 @@ export default function ColeccionScreen() {
     return String(flat.length);
   }
 
+  function isSectionComplete(sectionData: Sticker[][]): boolean {
+    if (filter !== 'todas') return false;
+    const flat = sectionData.flat();
+    return flat.length > 0 && flat.every((s) => (coleccion[s.code] ?? 0) >= 1);
+  }
+
+  const pct = Math.round(progress * 100);
+
   return (
     <View style={styles.container}>
       <SectionList
         sections={filteredSections}
         keyExtractor={(_row, rowIndex) => String(rowIndex)}
         stickySectionHeadersEnabled
-        renderSectionHeader={({ section }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>
-              {section.flag} {section.title}
-            </Text>
-            <Text style={styles.sectionCount}>
-              {loaded ? sectionCountLabel(section.data) : '—'}
-            </Text>
-          </View>
-        )}
+        renderSectionHeader={({ section }) => {
+          const complete = isSectionComplete(section.data);
+          return (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>
+                {section.flag} {section.title}
+              </Text>
+              <Text style={[styles.sectionCount, complete && styles.sectionCountComplete]}>
+                {loaded ? sectionCountLabel(section.data) : '—'}
+              </Text>
+            </View>
+          );
+        }}
         renderItem={({ item: row }) => (
           <View style={styles.row}>
             {row.map((sticker: Sticker) => (
@@ -72,16 +91,22 @@ export default function ColeccionScreen() {
                 onChange={setSticker}
               />
             ))}
+            {Array.from({ length: COLS_COUNT - row.length }).map((_, i) => (
+              <View key={`pad-${i}`} style={styles.cellPad} />
+            ))}
           </View>
         )}
         ListHeaderComponent={
-          <View style={styles.header}>
+          <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
             <Text style={styles.headerTitle}>misFigus WC2026</Text>
-            <Text style={styles.headerSub}>
-              {loaded ? owned : '—'} / {TOTAL} figuritas
-            </Text>
+            <View style={styles.headerSubRow}>
+              <Text style={styles.headerSub}>
+                {loaded ? owned : '—'} / {TOTAL} figuritas
+              </Text>
+              <Text style={styles.headerPct}>{loaded ? `${pct}%` : ''}</Text>
+            </View>
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
+              <View style={[styles.progressFill, { width: `${pct}%` }]} />
             </View>
             <View style={styles.filterRow}>
               {FILTERS.map((f) => (
@@ -97,6 +122,13 @@ export default function ColeccionScreen() {
               ))}
             </View>
           </View>
+        }
+        ListEmptyComponent={
+          filter !== 'todas' ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>{EMPTY_MSG[filter]}</Text>
+            </View>
+          ) : null
         }
         contentContainerStyle={styles.listContent}
       />
@@ -114,7 +146,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 48,
     paddingBottom: 12,
   },
   headerTitle: {
@@ -122,10 +153,20 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
   },
+  headerSubRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginTop: 4,
+  },
   headerSub: {
     color: '#888',
     fontSize: 14,
-    marginTop: 4,
+  },
+  headerPct: {
+    color: '#4ade80',
+    fontSize: 13,
+    fontWeight: '600',
   },
   progressTrack: {
     height: 4,
@@ -184,10 +225,25 @@ const styles = StyleSheet.create({
     color: '#555',
     fontSize: 13,
   },
+  sectionCountComplete: {
+    color: '#4ade80',
+  },
   row: {
     flexDirection: 'row',
     paddingHorizontal: 8,
     paddingVertical: 4,
     gap: 4,
+  },
+  cellPad: {
+    flex: 1,
+    aspectRatio: 1,
+  },
+  emptyState: {
+    paddingTop: 80,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#555',
+    fontSize: 16,
   },
 });

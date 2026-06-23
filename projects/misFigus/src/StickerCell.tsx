@@ -25,7 +25,11 @@ export function StickerCell({ sticker, value, onChange }: Props) {
 
   return (
     <Pressable
-      style={[styles.cell, owned ? styles.cellOwned : styles.cellMissing]}
+      style={({ pressed }) => [
+        styles.cell,
+        owned ? styles.cellOwned : styles.cellMissing,
+        pressed && styles.cellPressed,
+      ]}
       onPress={handlePress}
       onLongPress={handleLongPress}
     >
@@ -68,6 +72,9 @@ const styles = StyleSheet.create({
   },
   codeOwned: {
     color: '#4ade80',
+  },
+  cellPressed: {
+    opacity: 0.6,
   },
   badge: {
     position: 'absolute',

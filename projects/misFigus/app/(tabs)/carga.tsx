@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FLAGS, STICKER_MAP } from '../../src/data';
 import { useColeccion } from '../../src/useColeccion';
 
@@ -22,6 +23,7 @@ type Feedback = { ok: boolean; msg: string };
 
 export default function CargaScreen() {
   const { coleccion, setSticker } = useColeccion();
+  const insets = useSafeAreaInsets();
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [recientes, setRecientes] = useState<Reciente[]>([]);
@@ -62,7 +64,7 @@ export default function CargaScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 24 }]}>
       <Text style={styles.title}>Carga rápida</Text>
       <Text style={styles.subtitle}>Ingresá el código y presioná +1</Text>
 
@@ -123,7 +125,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0a0a0a',
-    paddingTop: 64,
     paddingHorizontal: 16,
   },
   title: {
