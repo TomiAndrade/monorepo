@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLS_COUNT, SECTIONS, TOTAL, type Sticker, type StickerSection } from '../../src/data';
+import { COLS_COUNT, SECTIONS, STICKER_MAP, TOTAL, type Sticker, type StickerSection } from '../../src/data';
+import { StickerAdjust } from '../../src/StickerAdjust';
 import { StickerCell } from '../../src/StickerCell';
 import { useColeccion } from '../../src/useColeccion';
 
@@ -13,10 +14,14 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'repes', label: 'Repes' },
 ];
 
+// Lookup del total real de cada sección (pre-calculado, no depende de coleccion)
+const SECTION_STICKERS = new Map(SECTIONS.map((s) => [s.title, s.data.flat()]));
+
 export default function ColeccionScreen() {
   const { coleccion, loaded, setSticker } = useColeccion();
   const [filter, setFilter] = useState<Filter>('todas');
   const [search, setSearch] = useState('');
+  const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
 
   const owned = Object.values(coleccion).filter((v) => v >= 1).length;
@@ -43,18 +48,15 @@ export default function ColeccionScreen() {
       .filter((s): s is StickerSection => s !== null);
   }, [filter, coleccion, search]);
 
-  function sectionCountLabel(sectionData: Sticker[][]): string {
-    const flat = sectionData.flat();
-    if (filter === 'todas') {
-      const o = flat.filter((s) => (coleccion[s.code] ?? 0) >= 1).length;
-      return `${o} / ${flat.length}`;
-    }
-    return String(flat.length);
+  // Siempre muestra el total real de la sección, independiente del filtro activo
+  function sectionCountLabel(section: StickerSection): string {
+    const flat = SECTION_STICKERS.get(section.title) ?? section.data.flat();
+    const o = flat.filter((s) => (coleccion[s.code] ?? 0) >= 1).length;
+    return `${o} / ${flat.length}`;
   }
 
-  function isSectionComplete(sectionData: Sticker[][]): boolean {
-    if (filter !== 'todas') return false;
-    const flat = sectionData.flat();
+  function isSectionComplete(section: StickerSection): boolean {
+    const flat = SECTION_STICKERS.get(section.title) ?? section.data.flat();
     return flat.length > 0 && flat.every((s) => (coleccion[s.code] ?? 0) >= 1);
   }
 
@@ -67,7 +69,6 @@ export default function ColeccionScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Barra de búsqueda fija — siempre visible */}
       <View style={[styles.searchBar, { paddingTop: insets.top + 8 }]}>
         <View style={styles.searchInputWrapper}>
           <TextInput
@@ -92,14 +93,14 @@ export default function ColeccionScreen() {
         keyExtractor={(_row, rowIndex) => String(rowIndex)}
         stickySectionHeadersEnabled
         renderSectionHeader={({ section }) => {
-          const complete = isSectionComplete(section.data);
+          const complete = isSectionComplete(section);
           return (
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionHeaderText}>
                 {section.flag} {section.title}
               </Text>
               <Text style={[styles.sectionCount, complete && styles.sectionCountComplete]}>
-                {loaded ? sectionCountLabel(section.data) : '—'}
+                {loaded ? sectionCountLabel(section) : '—'}
               </Text>
             </View>
           );
@@ -112,6 +113,7 @@ export default function ColeccionScreen() {
                 sticker={sticker}
                 value={coleccion[sticker.code] ?? 0}
                 onChange={setSticker}
+                onSelect={setSelectedCode}
               />
             ))}
             {Array.from({ length: COLS_COUNT - row.length }).map((_, i) => (
@@ -153,6 +155,11 @@ export default function ColeccionScreen() {
         }
         contentContainerStyle={styles.listContent}
         keyboardShouldPersistTaps="handled"
+      />
+
+      <StickerAdjust
+        sticker={selectedCode ? (STICKER_MAP.get(selectedCode) ?? null) : null}
+        onClose={() => setSelectedCode(null)}
       />
     </View>
   );

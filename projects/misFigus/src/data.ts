@@ -15,7 +15,7 @@ export type StickerSection = {
 
 export const FLAGS = banderas as Record<string, string>;
 
-const TEAM_ES: Record<string, string> = {
+export const TEAM_ES: Record<string, string> = {
   'We Are Panini': 'We Are Panini',
   'FIFA World Cup 2026': 'Copa Mundial FIFA 2026',
   'FIFA World Cup History': 'Historia Copa Mundial FIFA',

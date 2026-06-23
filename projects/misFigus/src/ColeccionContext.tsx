@@ -9,6 +9,7 @@ type ColeccionCtx = {
   coleccion: Coleccion;
   loaded: boolean;
   setSticker: (code: string, value: number) => void;
+  adjustSticker: (code: string, delta: number, min?: number) => void;
 };
 
 const ColeccionContext = createContext<ColeccionCtx | null>(null);
@@ -34,8 +35,16 @@ export function ColeccionProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const adjustSticker = useCallback((code: string, delta: number, min = 0) => {
+    setColeccion((prev) => {
+      const next = { ...prev, [code]: Math.max(min, (prev[code] ?? 0) + delta) };
+      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   return (
-    <ColeccionContext.Provider value={{ coleccion, loaded, setSticker }}>
+    <ColeccionContext.Provider value={{ coleccion, loaded, setSticker, adjustSticker }}>
       {children}
     </ColeccionContext.Provider>
   );

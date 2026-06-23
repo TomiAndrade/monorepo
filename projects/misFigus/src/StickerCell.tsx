@@ -6,25 +6,29 @@ type Props = {
   sticker: Sticker;
   value: number;
   onChange: (code: string, value: number) => void;
+  onSelect: (code: string) => void;
 };
 
-export function StickerCell({ sticker, value, onChange }: Props) {
+export function StickerCell({ sticker, value, onChange, onSelect }: Props) {
   const owned = value >= 1;
   const repes = value >= 2 ? value - 1 : 0;
 
   function handlePress() {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onChange(sticker.code, owned ? value + 1 : 1);
+    if (!owned) {
+      // único tap que cambia cantidad: falta → tengo
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onChange(sticker.code, 1);
+    } else {
+      // abre controles +/−
+      onSelect(sticker.code);
+    }
   }
 
   function handleLongPress() {
     if (!owned) return;
-    Haptics.impactAsync(
-      value === 1
-        ? Haptics.ImpactFeedbackStyle.Heavy
-        : Haptics.ImpactFeedbackStyle.Medium
-    );
-    onChange(sticker.code, value - 1);
+    // único camino para volver a 0
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    onChange(sticker.code, 0);
   }
 
   return (
@@ -36,6 +40,7 @@ export function StickerCell({ sticker, value, onChange }: Props) {
       ]}
       onPress={handlePress}
       onLongPress={handleLongPress}
+      delayLongPress={500}
     >
       <Text style={[styles.code, owned ? styles.codeOwned : styles.codeMissing]}>
         {sticker.code}
