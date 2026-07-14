@@ -1,0 +1,70 @@
+name: CI SIMA Training
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'TRAINING/**'
+      - '.github/workflows/ci-sima-training.yml'
+  pull_request:
+    paths:
+      - 'TRAINING/**'
+  workflow_dispatch:
+
+# Sprint 1: solo lint + build + test. El deploy a Render/Railway se agrega
+# cuando se conecte la cuenta cloud (ver TRAINING/sima-training-api/render.yaml).
+
+jobs:
+  api:
+    name: Backend (sima-training-api)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: TRAINING/sima-training-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: TRAINING/sima-training-api/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Prisma generate
+        run: npx prisma generate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+  backoffice:
+    name: Frontend (sima-training-backoffice)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: TRAINING/sima-training-backoffice
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: TRAINING/sima-training-backoffice/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
