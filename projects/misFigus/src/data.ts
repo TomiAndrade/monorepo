@@ -71,7 +71,7 @@ export const TEAM_ES: Record<string, string> = {
 };
 
 // Group stickers into rows of COLS for the grid
-const COLS = 5;
+const COLS = 4;
 
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const chunks: T[][] = [];

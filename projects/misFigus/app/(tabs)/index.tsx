@@ -6,6 +6,7 @@ import { StickerCell } from '../../src/StickerCell';
 import { SubtractBar } from '../../src/SubtractBar';
 import { UndoToast, type UndoAction } from '../../src/UndoToast';
 import { useColeccion } from '../../src/useColeccion';
+import { makeUseThemedStyles, useTheme } from '../../src/ThemeContext';
 
 type Filter = 'todas' | 'faltan' | 'repes';
 
@@ -22,6 +23,8 @@ const SECTION_STICKERS = new Map(SECTIONS.map((s) => [s.title, s.data.flat()]));
 const SUBTRACT_BAR_H = 76;
 
 export default function ColeccionScreen() {
+  const styles = useStyles();
+  const { mode, colors, toggle } = useTheme();
   const { coleccion, loaded, adjustSticker, setSticker } = useColeccion();
   const [filter, setFilter] = useState<Filter>('todas');
   const [search, setSearch] = useState('');
@@ -119,15 +122,43 @@ export default function ColeccionScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Barra de búsqueda fija */}
-      <View style={[styles.searchBar, { paddingTop: insets.top + 8 }]}>
+      {/* Cabecera fija: título, progreso, filtros y búsqueda quedan pegados al scrollear */}
+      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.headerTitleRow}>
+          <Text style={styles.headerTitle}>misFigus WC2026</Text>
+          <Pressable style={styles.themeToggle} onPress={toggle} hitSlop={8}>
+            <Text style={styles.themeToggleIcon}>{mode === 'dark' ? '☀️' : '🌙'}</Text>
+          </Pressable>
+        </View>
+        <View style={styles.headerSubRow}>
+          <Text style={styles.headerSub}>
+            {loaded ? owned : '—'} / {TOTAL} figuritas
+          </Text>
+          <Text style={styles.headerPct}>{loaded ? `${pct}%` : ''}</Text>
+        </View>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${pct}%` }]} />
+        </View>
+        <View style={styles.filterRow}>
+          {FILTERS.map((f) => (
+            <Pressable
+              key={f.key}
+              style={[styles.filterBtn, filter === f.key && styles.filterBtnActive]}
+              onPress={() => setFilter(f.key)}
+            >
+              <Text style={[styles.filterText, filter === f.key && styles.filterTextActive]}>
+                {f.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
         <View style={styles.searchInputWrapper}>
           <TextInput
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
             placeholder="Buscar equipo..."
-            placeholderTextColor="#333"
+            placeholderTextColor={colors.textFaint}
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -176,33 +207,6 @@ export default function ColeccionScreen() {
             ))}
           </View>
         )}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>misFigus WC2026</Text>
-            <View style={styles.headerSubRow}>
-              <Text style={styles.headerSub}>
-                {loaded ? owned : '—'} / {TOTAL} figuritas
-              </Text>
-              <Text style={styles.headerPct}>{loaded ? `${pct}%` : ''}</Text>
-            </View>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${pct}%` }]} />
-            </View>
-            <View style={styles.filterRow}>
-              {FILTERS.map((f) => (
-                <Pressable
-                  key={f.key}
-                  style={[styles.filterBtn, filter === f.key && styles.filterBtnActive]}
-                  onPress={() => setFilter(f.key)}
-                >
-                  <Text style={[styles.filterText, filter === f.key && styles.filterTextActive]}>
-                    {f.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyStateText}>{emptyMsg()}</Text>
@@ -226,144 +230,161 @@ export default function ColeccionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0a0a0a',
-  },
-  searchBar: {
-    backgroundColor: '#0a0a0a',
-    paddingHorizontal: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
-  },
-  searchInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#141414',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-    paddingHorizontal: 12,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    color: '#fff',
-    fontSize: 15,
-  },
-  searchClear: {
-    padding: 4,
-  },
-  searchClearText: {
-    color: '#555',
-    fontSize: 13,
-  },
-  listContent: {
-    paddingBottom: 32,
-  },
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  headerSubRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginTop: 4,
-  },
-  headerSub: {
-    color: '#888',
-    fontSize: 14,
-  },
-  headerPct: {
-    color: '#4ade80',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  progressTrack: {
-    height: 4,
-    backgroundColor: '#1f1f1f',
-    borderRadius: 2,
-    marginTop: 10,
-    marginBottom: 14,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: 4,
-    backgroundColor: '#4ade80',
-    borderRadius: 2,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 4,
-  },
-  filterBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  filterBtnActive: {
-    backgroundColor: '#0d2d1a',
-    borderColor: '#4ade80',
-  },
-  filterText: {
-    color: '#555',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  filterTextActive: {
-    color: '#4ade80',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#111',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1f1f1f',
-  },
-  sectionHeaderText: {
-    color: '#e0e0e0',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  sectionCount: {
-    color: '#555',
-    fontSize: 13,
-  },
-  sectionCountComplete: {
-    color: '#4ade80',
-  },
-  row: {
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    gap: 4,
-  },
-  cellPad: {
-    flex: 1,
-    aspectRatio: 1,
-  },
-  emptyState: {
-    paddingTop: 80,
-    alignItems: 'center',
-  },
-  emptyStateText: {
-    color: '#555',
-    fontSize: 16,
-  },
-});
+const useStyles = makeUseThemedStyles((c) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.bg,
+    },
+    topBar: {
+      backgroundColor: c.bg,
+      paddingHorizontal: 16,
+      paddingBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: c.border,
+    },
+    searchInputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: c.surface,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: c.border,
+      paddingHorizontal: 12,
+      marginTop: 2,
+    },
+    searchInput: {
+      flex: 1,
+      height: 40,
+      color: c.text,
+      fontSize: 15,
+    },
+    searchClear: {
+      padding: 4,
+    },
+    searchClearText: {
+      color: c.textMuted,
+      fontSize: 13,
+    },
+    listContent: {
+      paddingBottom: 32,
+      paddingTop: 4,
+    },
+    headerTitleRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      color: c.text,
+      fontSize: 22,
+      fontWeight: 'bold',
+    },
+    themeToggle: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    themeToggleIcon: {
+      fontSize: 18,
+    },
+    headerSubRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
+      marginTop: 4,
+    },
+    headerSub: {
+      color: c.textMuted,
+      fontSize: 14,
+    },
+    headerPct: {
+      color: c.primary,
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    progressTrack: {
+      height: 4,
+      backgroundColor: c.surfaceAlt,
+      borderRadius: 2,
+      marginTop: 10,
+      marginBottom: 14,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: 4,
+      backgroundColor: c.primary,
+      borderRadius: 2,
+    },
+    filterRow: {
+      flexDirection: 'row',
+      gap: 8,
+      marginBottom: 10,
+    },
+    filterBtn: {
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      borderRadius: 16,
+      backgroundColor: c.surfaceAlt,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    filterBtnActive: {
+      backgroundColor: c.primary,
+      borderColor: c.primary,
+    },
+    filterText: {
+      color: c.textMuted,
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    filterTextActive: {
+      color: c.onPrimary,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: c.surface,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: c.border,
+    },
+    sectionHeaderText: {
+      color: c.text,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    sectionCount: {
+      color: c.textMuted,
+      fontSize: 13,
+    },
+    sectionCountComplete: {
+      color: c.owned,
+    },
+    row: {
+      flexDirection: 'row',
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      gap: 8,
+    },
+    cellPad: {
+      flex: 1,
+      aspectRatio: 1,
+    },
+    emptyState: {
+      paddingTop: 80,
+      alignItems: 'center',
+    },
+    emptyStateText: {
+      color: c.textMuted,
+      fontSize: 16,
+    },
+  })
+);

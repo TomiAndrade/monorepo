@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FLAGS, STICKER_MAP } from '../../src/data';
 import { useColeccion } from '../../src/useColeccion';
+import { makeUseThemedStyles, useTheme } from '../../src/ThemeContext';
 
 type Reciente = {
   id: string;
@@ -22,6 +23,8 @@ type Reciente = {
 type Feedback = { ok: boolean; msg: string };
 
 export default function CargaScreen() {
+  const styles = useStyles();
+  const { colors } = useTheme();
   const { coleccion, setSticker } = useColeccion();
   const insets = useSafeAreaInsets();
   const [input, setInput] = useState('');
@@ -75,7 +78,7 @@ export default function CargaScreen() {
           onChangeText={(t) => setInput(t.toUpperCase())}
           onSubmitEditing={handleSubmit}
           placeholder="ARG1"
-          placeholderTextColor="#333"
+          placeholderTextColor={colors.textFaint}
           autoCapitalize="characters"
           autoCorrect={false}
           returnKeyType="done"
@@ -121,117 +124,119 @@ export default function CargaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0a0a0a',
-    paddingHorizontal: 16,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    color: '#555',
-    fontSize: 14,
-    marginBottom: 20,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  input: {
-    flex: 1,
-    height: 52,
-    backgroundColor: '#111',
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-  addBtn: {
-    width: 72,
-    height: 52,
-    backgroundColor: '#4ade80',
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addBtnText: {
-    color: '#000',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  feedbackContainer: {
-    height: 44,
-    marginTop: 12,
-    justifyContent: 'center',
-  },
-  feedback: {
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  feedbackOk: {
-    backgroundColor: '#0d2d1a',
-    borderWidth: 1,
-    borderColor: '#4ade80',
-  },
-  feedbackErr: {
-    backgroundColor: '#2d0d0d',
-    borderWidth: 1,
-    borderColor: '#f87171',
-  },
-  feedbackText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  feedbackTextOk: {
-    color: '#4ade80',
-  },
-  feedbackTextErr: {
-    color: '#f87171',
-  },
-  recentesTitle: {
-    color: '#555',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    marginTop: 24,
-    marginBottom: 8,
-    textTransform: 'uppercase',
-  },
-  recenteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#111',
-    gap: 10,
-  },
-  recenteCode: {
-    color: '#4ade80',
-    fontSize: 13,
-    fontWeight: '700',
-    width: 52,
-  },
-  recenteName: {
-    color: '#aaa',
-    fontSize: 13,
-    flex: 1,
-  },
-  recenteTag: {
-    color: '#4ade80',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  recenteTagRepe: {
-    color: '#f59e0b',
-  },
-});
+const useStyles = makeUseThemedStyles((c) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.bg,
+      paddingHorizontal: 16,
+    },
+    title: {
+      color: c.text,
+      fontSize: 22,
+      fontWeight: 'bold',
+      marginBottom: 4,
+    },
+    subtitle: {
+      color: c.textMuted,
+      fontSize: 14,
+      marginBottom: 20,
+    },
+    inputRow: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    input: {
+      flex: 1,
+      height: 52,
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: 10,
+      paddingHorizontal: 16,
+      color: c.text,
+      fontSize: 20,
+      fontWeight: '600',
+      letterSpacing: 1,
+    },
+    addBtn: {
+      width: 72,
+      height: 52,
+      backgroundColor: c.primary,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    addBtnText: {
+      color: c.onPrimary,
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    feedbackContainer: {
+      height: 44,
+      marginTop: 12,
+      justifyContent: 'center',
+    },
+    feedback: {
+      borderRadius: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    feedbackOk: {
+      backgroundColor: c.ownedBg,
+      borderWidth: 1,
+      borderColor: c.owned,
+    },
+    feedbackErr: {
+      backgroundColor: c.surface,
+      borderWidth: 1,
+      borderColor: c.danger,
+    },
+    feedbackText: {
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    feedbackTextOk: {
+      color: c.owned,
+    },
+    feedbackTextErr: {
+      color: c.danger,
+    },
+    recentesTitle: {
+      color: c.textMuted,
+      fontSize: 12,
+      fontWeight: '600',
+      letterSpacing: 0.5,
+      marginTop: 24,
+      marginBottom: 8,
+      textTransform: 'uppercase',
+    },
+    recenteRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: c.border,
+      gap: 10,
+    },
+    recenteCode: {
+      color: c.primary,
+      fontSize: 13,
+      fontWeight: '700',
+      width: 52,
+    },
+    recenteName: {
+      color: c.textMuted,
+      fontSize: 13,
+      flex: 1,
+    },
+    recenteTag: {
+      color: c.owned,
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    recenteTagRepe: {
+      color: c.repe,
+    },
+  })
+);

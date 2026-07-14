@@ -1,6 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useColeccion } from './useColeccion';
+import { makeUseThemedStyles } from './ThemeContext';
 
 type Props = {
   code: string | null;
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export function SubtractBar({ code, onClose }: Props) {
+  const styles = useStyles();
   const { coleccion, adjustSticker } = useColeccion();
 
   if (!code) return null;
@@ -51,78 +53,80 @@ export function SubtractBar({ code, onClose }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  bar: {
-    position: 'absolute',
-    bottom: 8,
-    left: 12,
-    right: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#141414',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#4ade80',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  info: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  code: {
-    color: '#4ade80',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  count: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  minusBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 10,
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#4ade80',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  minusBtnDisabled: {
-    borderColor: '#2a2a2a',
-    backgroundColor: '#111',
-  },
-  minusBtnPressed: {
-    backgroundColor: '#0d2d1a',
-  },
-  minusBtnText: {
-    color: '#4ade80',
-    fontSize: 28,
-    fontWeight: '300',
-    lineHeight: 32,
-  },
-  minusBtnTextDisabled: {
-    color: '#2a2a2a',
-  },
-  closeBtn: {
-    width: 44,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeBtnText: {
-    color: '#4ade80',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-});
+const useStyles = makeUseThemedStyles((c) =>
+  StyleSheet.create({
+    bar: {
+      position: 'absolute',
+      bottom: 8,
+      left: 12,
+      right: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: c.surface,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: c.primary,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      gap: 12,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    info: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    code: {
+      color: c.primary,
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    count: {
+      color: c.text,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    minusBtn: {
+      width: 52,
+      height: 52,
+      borderRadius: 10,
+      backgroundColor: c.surfaceAlt,
+      borderWidth: 1,
+      borderColor: c.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    minusBtnDisabled: {
+      borderColor: c.border,
+      backgroundColor: c.surfaceAlt,
+    },
+    minusBtnPressed: {
+      backgroundColor: c.ownedBg,
+    },
+    minusBtnText: {
+      color: c.primary,
+      fontSize: 28,
+      fontWeight: '300',
+      lineHeight: 32,
+    },
+    minusBtnTextDisabled: {
+      color: c.borderStrong,
+    },
+    closeBtn: {
+      width: 44,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    closeBtnText: {
+      color: c.primary,
+      fontSize: 20,
+      fontWeight: '600',
+    },
+  })
+);

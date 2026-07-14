@@ -5,17 +5,16 @@
     "scheme": "misfigus",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logofigus.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.tomiandrade.misfigus",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/logofigus.png"
       },
       "predictiveBackGestureEnabled": false
     },
@@ -25,9 +24,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-asset",
       "expo-font",
       "expo-splash-screen"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d387ea54-7699-455c-8208-aaee170dee00"
+      }
+    }
   }
 }

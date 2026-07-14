@@ -10,19 +10,7 @@ App Expo (React Native) para llevar el registro de la colección Panini WC2026. 
 - expo-haptics para feedback táctil
 - React Native SectionList para la grilla por sección
 
-## Estructura
-```
-app/
-  _layout.tsx          ← SafeAreaProvider + Slot (root)
-  (tabs)/
-    _layout.tsx        ← Tab bar (negro, acento verde)
-    index.tsx          ← Pantalla Colección
-    carga.tsx          ← Pantalla Carga rápida (placeholder)
-src/
-  data.ts              ← Carga JSONs, construye SECTIONS, STICKER_MAP, etc.
-figuritas-wc2026.json  ← Catálogo 980 figuritas { code, name, team }
-banderas.json          ← Mapeo team → emoji
-```
+## Estructura (ver "Estructura extendida" más abajo para detalle completo)
 
 ## Datos clave (src/data.ts)
 - `SECTIONS`: array de `{ title, flag, data: Sticker[][] }` — las filas ya están chunkeadas en grupos de 5 para la grilla
@@ -36,34 +24,68 @@ banderas.json          ← Mapeo team → emoji
 - Formato: `{ [code: string]: number }` — solo los que el usuario tocó
 - `0` o ausente = falta | `1` = la tengo | `2+` = tengo + repes (repes = cantidad - 1)
 
-## Estado actual — completado hasta Paso 2 de 8
+## Estructura extendida
+```
+app/
+  _layout.tsx              ← SafeAreaProvider + ColeccionProvider + Slot (root)
+  (tabs)/
+    _layout.tsx            ← Tab bar (negro, acento verde)
+    index.tsx              ← Pantalla Colección (completa)
+    carga.tsx              ← Pantalla Carga rápida (completa)
+src/
+  data.ts                  ← Carga JSONs, construye SECTIONS, STICKER_MAP, FLAGS, etc.
+  ColeccionContext.tsx      ← Context + Provider + useColeccion hook (AsyncStorage)
+  useColeccion.ts          ← Re-export de ColeccionContext
+  StickerCell.tsx          ← Celda con tres estados, haptics, long-press
+  SubtractBar.tsx          ← Barra flotante para restar figuritas
+  UndoToast.tsx            ← Toast con botón Deshacer (2.5s)
+figuritas-wc2026.json      ← Catálogo 980 figuritas { code, name, team }
+banderas.json              ← Mapeo team → emoji
+```
+
+## Estado actual — app completa ✅
 
 ### ✅ Paso 1 — Scaffold
 - Expo + Expo Router instalado y funcionando (web + Expo Go)
-- Dependencias: expo-router, async-storage, expo-haptics, react-native-web, react-dom, expo-linking, expo-constants, expo-font, expo-splash-screen, @expo/metro-runtime, babel-preset-expo
 
-### ✅ Paso 2 — SectionList con datos crudos
-- `src/data.ts` construye las secciones desde los JSON
-- `app/(tabs)/index.tsx` muestra SectionList con sticky headers (emoji + nombre + "0/Y") y grilla de cuadraditos oscuros con el código
+### ✅ Paso 2 — SectionList con datos
+- `src/data.ts` construye SECTIONS, STICKER_MAP, FLAGS desde los JSON
 
-### ⏳ Paso 3 — AsyncStorage (PRÓXIMO)
-- Leer colección al iniciar, cargar en estado (en memoria)
-- Escribir automáticamente en cada cambio
-- Clave: `"coleccion-wc2026"`
+### ✅ Paso 3 — AsyncStorage
+- `ColeccionContext.tsx`: Provider con `setSticker` y `adjustSticker` (updater funcional, seguro para taps rápidos)
+- Lee al iniciar, persiste en cada cambio, maneja JSON corrupto con graceful fallback
 
-### Pasos pendientes
-4. Lógica tap / +/− / long-press + tres estados visuales (falta/tengo/repe)
-5. Barra de progreso global + filtro Todas/Faltan/Repes
-6. Pantalla Carga rápida (input → +1 al código)
-7. Pulido visual: tema "stadium at night" completo
+### ✅ Paso 4 — Lógica tap / +/− / long-press
+- **Tap**: +1 con haptic Light
+- **Long-press (tengo × 1)**: reset a 0 con haptic Heavy
+- **Long-press (repe)**: abre `SubtractBar` con haptic Medium
+- `SubtractBar`: barra flotante en el fondo, botón −1 (mínimo 1), cierra con ✓ o scroll
+- `UndoToast`: aparece 2.5s tras cada tap, sube cuando SubtractBar está visible
+- Flag `longPressTriggered` en ref para evitar que onPress se dispare al soltar un long-press
 
-## Estética objetivo: "stadium at night"
+### ✅ Paso 5 — Barra de progreso + filtros + búsqueda
+- Header: título, `X / 980 figuritas`, porcentaje en verde, barra de progreso verde
+- Filtros: Todas / Faltan / Repes (re-chunkea las filas al filtrar)
+- Búsqueda por nombre de equipo (barra sticky en el tope)
+- Header de sección se pone verde cuando la sección está completa
+
+### ✅ Paso 6 — Pantalla Carga rápida
+- Input con `autoFocus` y `autoCapitalize="characters"`
+- Busca en STICKER_MAP, hace +1, muestra feedback verde/rojo por 2s
+- Lista de últimas 20 figuritas cargadas con tag "tengo" / "×N repe"
+
+### ✅ Paso 7 — Estética "stadium at night"
 - Fondo: `#0a0a0a`
-- Figurita falta: gris opaco (`#1a1a1a`, texto `#444`)
-- Figurita tengo: iluminada con acento verde (`#4ade80`)
-- Figurita repe: iluminada + badge ámbar con "×N"
-- Barra de progreso: verde de cancha
+- Figurita falta: `#1a1a1a` borde `#2a2a2a`, código `#444`
+- Figurita tengo: `#0d2d1a` borde `#4ade80`, código `#4ade80`
+- Figurita repe: igual que tengo + badge ámbar `#f59e0b` con `×N`
+- Barra de progreso: `#4ade80`
 - Tab bar: negro con acento verde
+
+## Posibles mejoras futuras
+- Exportar / compartir lista de repes
+- Modo "intercambio": marcar qué repes ofrecer y qué faltan buscar
+- Animación de entrada al marcar una figurita
 
 ## Notas
 - En Windows (web), los emojis de bandera no se ven como banderas — es esperado, no es un bug

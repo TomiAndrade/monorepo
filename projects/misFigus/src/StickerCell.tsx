@@ -2,6 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { useRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Sticker } from './data';
+import { makeUseThemedStyles } from './ThemeContext';
 
 type Props = {
   sticker: Sticker;
@@ -15,6 +16,7 @@ type Props = {
 export function StickerCell({
   sticker, value, subtractActive, onTap, onReset, onOpenSubtract,
 }: Props) {
+  const styles = useStyles();
   const owned = value >= 1;
   const repes = value >= 2 ? value - 1 : 0;
   // Evita que onPress se dispare al soltar un long-press
@@ -66,53 +68,55 @@ export function StickerCell({
   );
 }
 
-const styles = StyleSheet.create({
-  cell: {
-    flex: 1,
-    aspectRatio: 1,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  cellMissing: {
-    backgroundColor: '#1a1a1a',
-    borderColor: '#2a2a2a',
-  },
-  cellOwned: {
-    backgroundColor: '#0d2d1a',
-    borderColor: '#4ade80',
-  },
-  cellSubtractActive: {
-    borderColor: '#fff',
-    borderWidth: 2,
-  },
-  cellPressed: {
-    opacity: 0.6,
-  },
-  code: {
-    fontSize: 10,
-    fontWeight: '500',
-  },
-  codeMissing: {
-    color: '#444',
-  },
-  codeOwned: {
-    color: '#4ade80',
-  },
-  badge: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: '#f59e0b',
-    borderRadius: 3,
-    paddingHorizontal: 2,
-    paddingVertical: 1,
-  },
-  badgeText: {
-    color: '#000',
-    fontSize: 7,
-    fontWeight: 'bold',
-  },
-});
+const useStyles = makeUseThemedStyles((c) =>
+  StyleSheet.create({
+    cell: {
+      flex: 1,
+      aspectRatio: 1,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      overflow: 'hidden',
+    },
+    cellMissing: {
+      backgroundColor: c.surfaceAlt,
+      borderColor: c.border,
+    },
+    cellOwned: {
+      backgroundColor: c.ownedBg,
+      borderColor: c.owned,
+    },
+    cellSubtractActive: {
+      borderColor: c.primary,
+      borderWidth: 2,
+    },
+    cellPressed: {
+      opacity: 0.6,
+    },
+    code: {
+      fontSize: 16,
+      fontWeight: '700',
+    },
+    codeMissing: {
+      color: c.textFaint,
+    },
+    codeOwned: {
+      color: c.owned,
+    },
+    badge: {
+      position: 'absolute',
+      top: 3,
+      right: 3,
+      backgroundColor: c.repe,
+      borderRadius: 5,
+      paddingHorizontal: 4,
+      paddingVertical: 1,
+    },
+    badgeText: {
+      color: c.onRepe,
+      fontSize: 10,
+      fontWeight: 'bold',
+    },
+  })
+);
