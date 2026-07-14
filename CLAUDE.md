@@ -35,8 +35,4 @@ Scope = nombre del proyecto (`evidence-inventory`, `file-quality-report`).
 - Para mergear `develop` → `main`: PR en GitHub (o merge directo si es un proyecto personal sin revisores).
 - No hay CI configurado todavía.
 
-**Flujo típico:**
-1. Trabajar en `develop` (o en `feat/algo` si el cambio es grande).
-2. Commit con la convención de abajo.
-3. Push a `origin/develop`.
-4. Cuando el bloque de trabajo está estable, mergear a `main`.
+**El usuario maneja los commits y el push. Claude solo edita archivos.**
